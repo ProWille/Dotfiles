@@ -1,0 +1,141 @@
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+  "logo": {
+    "source": "~/.config/fastfetch/ascii.txt",
+    "height": 18,
+    "padding": {
+      "top": 5
+    },
+    "color": {
+      "1": "cyan"
+    }
+  },
+  "modules": [
+    {
+      "type": "custom",
+      "format": "\u001b[31mSYSTEM"
+    },
+    {
+      "type": "os",
+      "key": " ├   OS       ",
+      "keyColor": "red"
+    },
+    {
+      "type": "kernel",
+      "key": " ├   Kernel   ",
+      "keyColor": "red"
+    },
+    {
+      "type": "packages",
+      "format": "{} (pacman)",
+      "key": " ├ 󰏖  Packages ",
+      "keyColor": "red"
+    },
+    {
+      "type": "shell",
+      "key": " ├   Shell    ",
+      "keyColor": "red"
+    },
+    {
+      "type": "localip",
+      "key": " ├ 󰩟  Network  ",
+      "keyColor": "red",
+      "format": "{ipv4} ({ifname})"
+    },
+    {
+      "type": "uptime",
+      "key": " ├   Uptime   ",
+      "keyColor": "red"
+    },
+    {
+      "type": "command",
+      "key": " └ 󱦟  OS Age   ",
+      "keyColor": "red",
+      "text": "birth_install=$(stat -c %W /); current=$(date +%s); time_progression=$((current - birth_install)); days_difference=$((time_progression / 86400)); echo $days_difference days"
+    },
+    "break",
+    {
+      "type": "custom",
+      "format": "\u001b[34mDESKTOP"
+    },
+    {
+      "type": "de",
+      "key": " ├   DE       ",
+      "keyColor": "blue"
+    },
+    {
+      "type": "wm",
+      "key": " ├   WM       ",
+      "keyColor": "blue"
+    },
+    {
+      "type": "wmtheme",
+      "key": " ├ 󰉼  Theme    ",
+      "keyColor": "blue"
+    },
+    {
+      "type": "icons",
+      "key": " ├ 󰀻  Icons    ",
+      "keyColor": "blue"
+    },
+    {
+      "type": "cursor",
+      "key": " ├   Cursor   ",
+      "keyColor": "blue"
+    },
+    {
+      "type": "terminal",
+      "key": " ├   Terminal ",
+      "keyColor": "blue"
+    },
+    {
+      "type": "terminalfont",
+      "key": " └   Font     ",
+      "keyColor": "blue"
+    },
+    "break",
+    {
+      "type": "custom",
+      "format": "\u001b[35mHARDWARE"
+    },
+    {
+      "type": "cpu",
+      "format": "{1} ({4}) @ {7}",
+      "key": " ├   CPU      ",
+      "keyColor": "magenta"
+    },
+    {
+      "type": "gpu",
+      "format": "{1} {2} ({3})",
+      "key": " ├ 󰢮  GPU      ",
+      "keyColor": "magenta"
+    },
+    {
+      "type": "memory",
+      "key": " ├   Memory   ",
+      "keyColor": "magenta"
+    },
+    {
+      "type": "swap",
+      "key": " ├ 󰓡  Swap     ",
+      "keyColor": "magenta"
+    },
+    {
+      "type": "disk",
+      "format": "{1} / {2} ({3}), {9} ({20})",
+      "key": " ├ 󰋊  Disk     ",
+      "keyColor": "magenta"
+    },
+    {
+      "type": "display",
+      "key": " ├   Display  ",
+      "keyColor": "magenta"
+    },
+    {
+      "type": "command",
+      "text": "echo \"$(cat /sys/class/dmi/id/board_name) (BIOS Version $(cat /sys/class/dmi/id/bios_version))\"",
+      "key": " └   Board    ",
+      "keyColor": "magenta"
+    }
+  ]
+}
