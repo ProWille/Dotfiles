@@ -1,0 +1,79 @@
+# Noctalia idle behavior: fade/darken after 5 min, lock after 10 min, suspend after 15 min.
+# Noctalia owns the lock screen; hypridle only handles lock-on-manual-suspend glue.
+
+[idle]
+
+[idle.behavior.dim]
+timeout = 300
+action = "screen_off"
+enabled = true
+
+[idle.behavior.lock]
+timeout = 600
+action = "lock"
+enabled = true
+
+[idle.behavior.lock-and-suspend]
+timeout = 900
+action = "lock_and_suspend"
+enabled = true
+
+# Lock screen styled after the "sword" SDDM theme (dark navy gradient + big thin
+# clock top-left + steel-blue date + login panel bottom-right).
+[lockscreen]
+enabled            = true
+fingerprint        = true
+blurred_desktop    = false
+tint_intensity     = 0.0
+wallpaper          = "/home/william/.config/noctalia/lockscreen-bg.png"
+monitors           = ["DP-3"]
+
+[lockscreen_widgets]
+enabled      = true
+widget_order = ["clock_big", "clock_date", "login_box"]
+
+[lockscreen_widgets.widget.clock_big]
+type       = "clock"
+output     = "DP-3"
+cx         = 1280.0
+cy         = 630.0
+box_width  = 560.0
+box_height = 360.0
+
+[lockscreen_widgets.widget.clock_big.settings]
+format     = "{:%H:%M}"
+color      = "#ffffff"
+shadow     = false
+circle     = false
+background = false
+font_family = "The Last Shuriken"
+
+[lockscreen_widgets.widget.clock_date]
+type       = "clock"
+output     = "DP-3"
+cx         = 1280.0
+cy         = 800.0
+box_width  = 520.0
+box_height = 44.0
+
+[lockscreen_widgets.widget.clock_date.settings]
+format     = "{:%A · %B %d}"
+color      = "#6090b8"
+shadow     = false
+circle     = false
+background = false
+font_family = "The Last Shuriken"
+
+[lockscreen_widgets.widget.login_box]
+type       = "login_box"
+output     = "DP-3"
+cx         = 1280.0
+cy         = 1321.0
+box_width  = 525.0
+box_height = 250.0
+
+[lockscreen_widgets.widget.login_box.settings]
+background_opacity = 0.6
+input_radius       = 12.0
+center_password_text = true
+show_unlock_hint   = false

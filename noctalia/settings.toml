@@ -1,0 +1,266 @@
+config_version = 8
+
+[bar.default]
+background_opacity = 0.74999998323619366
+capsule = true
+capsule_thickness = 0.74999998696148396
+center = [ "clock", "weather" ]
+font_weight = 700
+margin_edge = 0
+margin_ends = 0
+padding = 12
+radius = 0
+radius_bottom_left = 12
+radius_bottom_right = 12
+start = [ "launcher", "wallpaper", "workspaces", "group:g1" ]
+thickness = 36
+
+    [bar.default.monitor.DP-2]
+    enabled = false
+
+    [bar.default.monitor.DP-3]
+    center = [ "clock", "weather" ]
+    end = [
+        "media",
+        "tray",
+        "notifications",
+        "clipboard",
+        "network",
+        "bluetooth",
+        "volume",
+        "brightness",
+        "battery",
+        "caffeine",
+        "control-center",
+        "session"
+    ]
+
+    [bar.default.monitor.HDMI-A-1]
+    enabled = false
+
+    [[bar.default.capsule_group]]
+    fill = "surface_variant"
+    id = "g1"
+    members = [ "cpu", "temp", "ram", "GPU-Usage", "GPU-Temperature", "network_rx", "network_tx" ]
+    opacity = 1.0
+    padding = 6.0
+
+[brightness]
+enable_ddcutil = true
+
+[dock]
+background_opacity = 0.74999998323619366
+concave_edge_corners = false
+cross_axis_padding = 4
+enabled = true
+icon_size = 36
+launcher_icon = "cat"
+launcher_position = "start"
+main_axis_padding = 8
+margin_edge = 4
+monitors = [ "DP-3" ]
+pinned = [
+    "dev.noctalia.Noctalia",
+    "kitty",
+    "org.kde.dolphin",
+    "firefox",
+    "proton.vpn.app.gtk",
+    "spotify-launcher",
+    "discord",
+    "hypnotix",
+    "code",
+    "org.godotengine.Godot-mono",
+    "blockbench",
+    "steam",
+    "com.heroicgameslauncher.hgl",
+    "net.lutris.Lutris",
+    "org.prismlauncher.PrismLauncher",
+    "io.github.ilya_zlobintsev.LACT",
+    "virt-manager"
+]
+reserve_space = false
+show_dots = true
+smart_auto_hide = true
+
+[location]
+address = "Stenungsund"
+
+[lockscreen]
+monitors = [ "DP-3" ]
+
+[lockscreen_widgets]
+enabled = true
+schema_version = 2
+widget_order = [ "lockscreen-login-box@DP-2", "lockscreen-login-box@HDMI-A-1", "clock_big", "clock_date", "login_box" ]
+
+    [lockscreen_widgets.grid]
+    cell_size = 16
+    major_interval = 4
+    visible = true
+
+    [lockscreen_widgets.widget.clock_big]
+    box_height = 360.0
+    box_width = 560.0
+    cx = 1280.0
+    cy = 630.0
+    output = "DP-3"
+    rotation = 0.0
+    type = "clock"
+
+        [lockscreen_widgets.widget.clock_big.settings]
+        background = false
+        circle = false
+        color = "#ffffff"
+        font_family = "The Last Shuriken"
+        format = "{:%H:%M}"
+        shadow = false
+
+    [lockscreen_widgets.widget.clock_date]
+    box_height = 44.0
+    box_width = 520.0
+    cx = 1280.0
+    cy = 800.0
+    output = "DP-3"
+    rotation = 0.0
+    type = "clock"
+
+        [lockscreen_widgets.widget.clock_date.settings]
+        background = false
+        circle = false
+        color = "#6090b8"
+        font_family = "The Last Shuriken"
+        format = "{:%A · %B %d}"
+        shadow = false
+
+    [lockscreen_widgets.widget."lockscreen-login-box@DP-2"]
+    box_height = 196.0
+    box_width = 810.0
+    cx = 540.0
+    cy = 1738.0
+    output = "DP-2"
+    rotation = 0.0
+    type = "login_box"
+
+        [lockscreen_widgets.widget."lockscreen-login-box@DP-2".settings]
+        background_color = "surface_variant"
+        background_opacity = 0.88
+        background_radius = 12.0
+        center_password_text = false
+        input_opacity = 1.0
+        input_radius = 6.0
+        layout = "regular"
+        show_caps_lock = true
+        show_keyboard_layout = true
+        show_login_button = true
+        show_media = true
+        show_session_buttons = true
+        show_unlock_hint = true
+        show_weather = true
+
+    [lockscreen_widgets.widget."lockscreen-login-box@HDMI-A-1"]
+    box_height = 196.0
+    box_width = 810.0
+    cx = 960.0
+    cy = 898.0
+    output = "HDMI-A-1"
+    rotation = 0.0
+    type = "login_box"
+
+        [lockscreen_widgets.widget."lockscreen-login-box@HDMI-A-1".settings]
+        background_color = "surface_variant"
+        background_opacity = 0.88
+        background_radius = 12.0
+        center_password_text = false
+        input_opacity = 1.0
+        input_radius = 6.0
+        layout = "regular"
+        show_caps_lock = true
+        show_keyboard_layout = true
+        show_login_button = true
+        show_media = true
+        show_session_buttons = true
+        show_unlock_hint = true
+        show_weather = true
+
+    [lockscreen_widgets.widget.login_box]
+    box_height = 196.0
+    box_width = 720.0
+    cx = 1280.0
+    cy = 1321.0
+    output = "DP-3"
+    rotation = 0.0
+    type = "login_box"
+
+        [lockscreen_widgets.widget.login_box.settings]
+        background_opacity = 0.59999999999999998
+        center_password_text = true
+        input_radius = 12.0
+        layout = "regular"
+        show_caps_lock = true
+        show_keyboard_layout = true
+        show_login_button = true
+        show_media = true
+        show_session_buttons = true
+        show_unlock_hint = false
+        show_weather = true
+
+[notification]
+monitors = [ "DP-3" ]
+
+[osd]
+monitors = [ "DP-3" ]
+
+[shell]
+font_family = "JetBrainsMono NF"
+settings_show_advanced = true
+
+    [shell.panel]
+    clipboard_placement = "attached"
+    launcher_placement = "attached"
+    transparency_mode = "glass"
+
+[system.monitor]
+gpu_poll_seconds = 5
+
+[theme]
+builtin = "Tokyo-Night"
+community_palette = "Oxocarbon"
+mode = "dark"
+source = "builtin"
+wallpaper_scheme = "m3-content"
+
+    [theme.templates]
+    builtin_ids = [ "btop", "cava", "gtk3", "gtk4", "hyprland", "kcolorscheme", "qt" ]
+    community_ids = [ "fuzzel", "papirus-icons", "steam", "yazi", "hyprtoolkit" ]
+
+[wallpaper]
+directory = "/home/william/GitHub/Wallpaper-Bank/wallpapers"
+
+    [wallpaper.default]
+    path = "/home/william/GitHub/Wallpaper-Bank/wallpapers/Fantasy-IcyMountain.png"
+
+    [wallpaper.last]
+    path = "/home/william/GitHub/Wallpaper-Bank/wallpapers/Fantasy-IcyMountain.png"
+
+    [wallpaper.monitors.DP-2]
+    path = "/home/william/GitHub/Wallpaper-Bank/wallpapers/Fantasy-IcyMountain.png"
+
+    [wallpaper.monitors.DP-3]
+    path = "/home/william/GitHub/Wallpaper-Bank/wallpapers/Fantasy-IcyMountain.png"
+
+    [wallpaper.monitors.HDMI-A-1]
+    path = "/home/william/GitHub/Wallpaper-Bank/wallpapers/Fantasy-IcyMountain.png"
+
+[widget.GPU-Temperature]
+stat = "gpu_temp"
+type = "sysmon"
+
+[widget.GPU-Usage]
+stat = "gpu_usage"
+type = "sysmon"
+
+[widget.clock]
+format = "{:%Y-%m-%d %H:%M}"
+
+[widget.sysmon]
+stat = "gpu_usage"
