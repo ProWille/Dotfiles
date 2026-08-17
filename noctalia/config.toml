@@ -77,3 +77,7 @@ background_opacity = 0.6
 input_radius       = 12.0
 center_password_text = true
 show_unlock_hint   = false
+
+[shell.screenshot]
+save_to_file    = true
+copy_to_clipboard = true

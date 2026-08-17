@@ -80,6 +80,10 @@ hl.bind(mainMod .. "+ H", hl.dsp.exec_cmd(ipc .. " panel-toggle control-center")
 hl.bind(mainMod .. "+ K", hl.dsp.exec_cmd(ipc .. " caffeine-toggle"))
 hl.bind(mainMod .. "+ comma", hl.dsp.exec_cmd(ipc .. " settings-toggle"))
 
+-- Screenshots
+hl.bind("Print",         hl.dsp.exec_cmd(ipc .. " screenshot-fullscreen"))
+hl.bind("SHIFT + Print", hl.dsp.exec_cmd(ipc .. " screenshot-region"))
+
 -- Media keys
 hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd(ipc .. " volume-up"))
 hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd(ipc .. " volume-down"))
