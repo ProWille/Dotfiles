@@ -81,3 +81,8 @@ show_unlock_hint   = false
 [shell.screenshot]
 save_to_file    = true
 copy_to_clipboard = true
+
+# Apply the default OpenRGB profile right before the system reboots/shuts down.
+[hooks]
+rebooting     = "pkill -x openrgb 2>/dev/null; sleep 0.5; openrgb --profile Default.orp"
+shutting_down = "pkill -x openrgb 2>/dev/null; sleep 0.5; openrgb --profile Default.orp"
