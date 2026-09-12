@@ -14,6 +14,7 @@ Personal configuration files for Hyprland (Lua config) + Noctalia desktop on Cac
 | `fuzzel/` | `~/.config/fuzzel/` | Launcher theme (generated) |
 | `yazi/` | `~/.config/yazi/` | File manager theme (generated) |
 | `gtk-3.0/`, `gtk-4.0/` | `~/.config/gtk-3.0/`, `~/.config/gtk-4.0/` | GTK themes (generated) |
+| `systemd/user/openrgb.service` | `~/.config/systemd/user/` | Starts OpenRGB at login (applies Zones profile) |
 | `systemd/user/openrgb-quit.service` | `~/.config/systemd/user/` | Quits OpenRGB gracefully before shutdown (applies its exit profile) |
 | `fastfetch/`, `kitty/`, `.zshrc`, `.p10k.zsh`, `.gitconfig` | various | Shell/terminal config |
 
