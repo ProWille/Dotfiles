@@ -3,30 +3,12 @@
 ------------------
 
 -- See https://wiki.hypr.land/Configuring/Basics/Monitors/
-hl.monitor({
-    output   = "DP-3",
-    mode     = "2560x1440@180",
-    position = "0x0",
-    scale    = "1",
-    cm 		 = "auto",
-})
+-- Host-specific monitors come from modules/host.lua (see ~/.config/machine).
+local host = require("modules.host")
 
-hl.monitor({
-	output	  = "DP-2",
-	mode	  = "1920x1080@144",
-	position  = "-1080x0",
-	scale	  = "1",
-	transform = 1,
-	disabled  = false,
-})
-
-hl.monitor({
-	output	 = "HDMI-A-1",
-	mode	 = "1920x1080@60",
-	position = "2560x0",
-	scale	 = "1",
-	disabled  = false,
-})
+for _, monitor in ipairs(host.monitors) do
+    hl.monitor(monitor)
+end
 
 hl.monitor({
 	output	  = "",

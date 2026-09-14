@@ -20,9 +20,11 @@ hl.config({
     },
 })
 
+local host = require("modules.host")
+
 hl.config({
     cursor = {
-        default_monitor = "DP-3",
+        default_monitor = host.default_monitor,
     },
 })
 

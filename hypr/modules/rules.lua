@@ -86,10 +86,8 @@ hl.window_rule({
     idle_inhibit = "fullscreen",
 })
 
-hl.workspace_rule({ workspace = "1", monitor = "DP-3", persistent = true })
-hl.workspace_rule({ workspace = "2", monitor = "DP-3", persistent = true })
-hl.workspace_rule({ workspace = "3", monitor = "DP-3", persistent = true })
-hl.workspace_rule({ workspace = "4", monitor = "DP-3", persistent = true })
-hl.workspace_rule({ workspace = "5", monitor = "DP-3", persistent = true })
-hl.workspace_rule({ workspace = "6", monitor = "DP-2", persistent = true })
-hl.workspace_rule({ workspace = "7", monitor = "HDMI-A-1", persistent = true })
+-- Persistent workspace -> monitor layout (host-specific, see modules/host.lua)
+local host = require("modules.host")
+for workspace, monitor in pairs(host.workspaces) do
+    hl.workspace_rule({ workspace = workspace, monitor = monitor, persistent = true })
+end
