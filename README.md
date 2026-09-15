@@ -90,8 +90,18 @@ Flags:
 | `--dry-run` | print what would happen without changing anything |
 | `--no-backup` | overwrite existing files without backing them up |
 | `--no-openrgb` | skip the PC-only OpenRGB systemd units |
+| `--openrgb` | deploy OpenRGB units even on a laptop |
 | `--skip-deps` | don't check or install packages |
 | `--with-gitconfig` | also deploy `~/.gitconfig` |
+| `--yes` | skip the first-run confirmation prompt |
+
+The installer checks for required packages and optionally installs any that are
+missing (`paru` or `yay` if present, otherwise `pacman`). It only prompts if
+something is missing; system packages already present are left alone.
+
+Backup note: any existing target file is moved to `.bak-<timestamp>` before it
+is replaced, so a mis-setup is one rename away from restore. Run
+`--dry-run` first on a machine you want to be extra sure about.
 
 The manual steps below remain if you prefer to deploy piece by piece.
 
@@ -114,9 +124,32 @@ shipped in the repo.
 
 ### Noctalia config
 
+`noctalia/config.toml` is a **template**: monitor names and lock-screen widget
+coordinates are machine-specific and are filled in by `install.sh` (it uses the
+same laptop/pc detection as `host.lua`). The placeholder tokens are:
+
+| Token | Meaning |
+|-------|---------|
+| `@@MAIN@@` | lock-screen monitor(s) + widget output |
+| `@@CB_CX@@` / `@@CB_CY@@` | clock_big center |
+| `@@CD_CX@@` / `@@CD_CY@@` | clock_date center |
+| `@@LB_CX@@` / `@@LB_CY@@` / `@@LB_W@@` | login_box center + width |
+
+If you deploy manually, substitute them yourself, e.g. for a laptop:
+
+```sh
+sed -e 's|@@MAIN@@|eDP-1|' -e 's|@@CB_CX@@|960.0|' -e 's|@@CB_CY@@|470.0|' \
+    -e 's|@@CD_CX@@|960.0|' -e 's|@@CD_CY@@|600.0|' \
+    -e 's|@@LB_CX@@|960.0|' -e 's|@@LB_CY@@|898.0|' -e 's|@@LB_W@@|720.0|' \
+    noctalia/config.toml > ~/.config/noctalia/config.toml
+```
+
+(prefer `install.sh` — it picks the right values automatically)
+
+Also copy:
+
 ```sh
 mkdir -p ~/.config/noctalia
-cp noctalia/config.toml ~/.config/noctalia/config.toml
 cp noctalia/lockscreen-bg.png ~/.config/noctalia/lockscreen-bg.png
 ```
 
@@ -143,6 +176,10 @@ cp .zshrc .p10k.zsh ~/.zshrc  # watch for existing .zshrc — back up first
 The `.p10k.zsh` is a large generated file; place it in `~/.p10k.zsh`.
 
 ### OpenRGB (PC only, optional)
+
+`install.sh` deploys the OpenRGB systemd units **only on desktops** by default
+(it runs the same laptop/pc detection as `host.lua`). On a laptop, pass
+`--openrgb` to force them. Manual setup:
 
 ```sh
 mkdir -p ~/.config/systemd/user

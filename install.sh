@@ -6,25 +6,30 @@ TS="$(date +%Y%m%d-%H%M%S)"
 
 DRY_RUN=false
 DO_BACKUP=true
-DO_OPENRGB=true
+OPENRGB_FLAG="auto"
 DO_DEPS=true
 DO_GITCONFIG=false
+DO_ASK=true
 
 for arg in "$@"; do
   case "$arg" in
     --dry-run)        DRY_RUN=true ;;
     --no-backup)      DO_BACKUP=false ;;
-    --no-openrgb)     DO_OPENRGB=false ;;
+    --no-openrgb)     OPENRGB_FLAG="off" ;;
+    --openrgb)        OPENRGB_FLAG="on" ;;
     --skip-deps)      DO_DEPS=false ;;
     --with-gitconfig) DO_GITCONFIG=true ;;
+    --yes)            DO_ASK=false ;;
     -h|--help)
       echo "Usage: bash install.sh [flags]"
       echo ""
       echo "  --dry-run         print actions without changing anything"
       echo "  --no-backup       overwrite existing files without backing them up"
       echo "  --no-openrgb      skip the PC-only OpenRGB systemd units"
+      echo "  --openrgb         deploy OpenRGB units even on a laptop"
       echo "  --skip-deps       don't check or install packages"
       echo "  --with-gitconfig  also deploy ~/.gitconfig"
+      echo "  --yes             skip the first-run confirmation prompt"
       exit 0
       ;;
     *)
@@ -53,6 +58,41 @@ if ls /sys/class/drm/ 2>/dev/null | grep -qE 'eDP-|LVDS-'; then
   HOST="laptop"
 fi
 echo "    this machine is a $HOST"
+
+case "$OPENRGB_FLAG" in
+  on)  DO_OPENRGB=true ;;
+  off) DO_OPENRGB=false ;;
+  auto)
+    if [ "$HOST" = "pc" ]; then
+      DO_OPENRGB=true
+    else
+      DO_OPENRGB=false
+    fi
+    ;;
+esac
+if [ "$DO_OPENRGB" = true ]; then
+  echo "    OpenRGB units: enabled"
+else
+  echo "    OpenRGB units: skipped (desktop-only by default; use --openrgb to force)"
+fi
+
+case "$HOST" in
+  laptop)
+    N_MAIN="eDP-1"
+    N_CB_CX="960.0";  N_CB_CY="470.0"
+    N_CD_CX="960.0";  N_CD_CY="600.0"
+    N_LB_CX="960.0";  N_LB_CY="898.0";  N_LB_W="720.0"
+    ;;
+  pc)
+    N_MAIN="DP-3"
+    N_CB_CX="1280.0"; N_CB_CY="630.0"
+    N_CD_CX="1280.0"; N_CD_CY="800.0"
+    N_LB_CX="1280.0"; N_LB_CY="1321.0"; N_LB_W="525.0"
+    ;;
+  *)
+    echo "    unknown preset '$HOST' - noctalia config keeps template placeholder"
+    ;;
+esac
 
 MARKER="$HOME/.config/machine"
 if [ "$DRY_RUN" = true ]; then
@@ -159,11 +199,89 @@ deploy_file() {
   fi
 }
 
+deploy_noctalia() {
+  local src="$1" dest="$2"
+  if [ ! -e "$src" ]; then
+    echo "    skip  $dest (no $src in repo)"
+    return
+  fi
+  mkdir -p "$(dirname "$dest")"
+  if [ -e "$dest" ]; then
+    if [ "$DO_BACKUP" = true ]; then
+      if [ "$DRY_RUN" = true ]; then
+        echo "    [dry-run] backup $dest -> $dest.bak-$TS"
+      else
+        mv "$dest" "$dest.bak-$TS"
+        echo "    backed up $dest -> $dest.bak-$TS"
+      fi
+    else
+      rm -rf "$dest"
+    fi
+  fi
+  if [ -z "${N_MAIN:-}" ]; then
+    if [ "$DRY_RUN" = true ]; then
+      echo "    [dry-run] deploy template $src -> $dest (unresolved placeholders)"
+    else
+      cp -a "$src" "$dest"
+      echo "    deployed template $src -> $dest (unresolved placeholders)"
+    fi
+    return
+  fi
+  if [ "$DRY_RUN" = true ]; then
+    echo "    [dry-run] render $src -> $dest (host=$HOST)"
+  else
+    sed -e "s|@@MAIN@@|$N_MAIN|g" \
+        -e "s|@@CB_CX@@|$N_CB_CX|g" \
+        -e "s|@@CB_CY@@|$N_CB_CY|g" \
+        -e "s|@@CD_CX@@|$N_CD_CX|g" \
+        -e "s|@@CD_CY@@|$N_CD_CY|g" \
+        -e "s|@@LB_CX@@|$N_LB_CX|g" \
+        -e "s|@@LB_CY@@|$N_LB_CY|g" \
+        -e "s|@@LB_W@@|$N_LB_W|g" \
+        "$src" > "$dest"
+    echo "    rendered $src -> $dest (host=$HOST)"
+  fi
+}
+
 echo "==> Deploying configs"
+
+CONFIRM_TARGETS=(
+  "$HOME/.config/hypr"
+  "$HOME/.config/kitty"
+  "$HOME/.config/fastfetch"
+  "$HOME/.config/noctalia/config.toml"
+  "$HOME/.config/noctalia/lockscreen-bg.png"
+  "$HOME/.zshrc"
+  "$HOME/.p10k.zsh"
+)
+if [ "$DO_OPENRGB" = true ]; then
+  CONFIRM_TARGETS+=("$HOME/.config/systemd/user/openrgb.service" "$HOME/.config/systemd/user/openrgb-quit.service")
+fi
+if [ "$DO_GITCONFIG" = true ]; then
+  CONFIRM_TARGETS+=("$HOME/.gitconfig")
+fi
+
+EXISTING=()
+for t in "${CONFIRM_TARGETS[@]}"; do
+  [ -e "$t" ] && EXISTING+=("$t")
+done
+
+if [ "$DRY_RUN" = false ] && [ "$DO_ASK" = true ] && [ "${#EXISTING[@]}" -gt 0 ]; then
+  echo "    The following will be replaced (and backed up):"
+  for t in "${EXISTING[@]}"; do
+    echo "      - $t"
+  done
+  read -rp "    Proceed? [y/N] " ans
+  if [[ ! "$ans" =~ ^[Yy]$ ]]; then
+    echo "    aborted - nothing was changed"
+    exit 1
+  fi
+fi
+
 deploy_dir  "$REPO_DIR/hypr"                  "$HOME/.config/hypr"
 deploy_dir  "$REPO_DIR/kitty"                 "$HOME/.config/kitty"
 deploy_dir  "$REPO_DIR/fastfetch"             "$HOME/.config/fastfetch"
-deploy_file "$REPO_DIR/noctalia/config.toml" "$HOME/.config/noctalia/config.toml"
+deploy_noctalia "$REPO_DIR/noctalia/config.toml" "$HOME/.config/noctalia/config.toml"
 deploy_file "$REPO_DIR/noctalia/lockscreen-bg.png" "$HOME/.config/noctalia/lockscreen-bg.png"
 deploy_file "$REPO_DIR/.zshrc"                "$HOME/.zshrc"
 deploy_file "$REPO_DIR/.p10k.zsh"             "$HOME/.p10k.zsh"
