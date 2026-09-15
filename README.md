@@ -3,7 +3,7 @@
 Personal configuration for Hyprland (Lua config) + Noctalia desktop,
 tested on Arch-based distributions (CachyOS, EndeavourOS).
 
-![Screenshot placeholder](docs/screenshots/desktop.png)
+![Desktop](docs/screenshots/desktop.webp)
 
 ## Features
 
@@ -16,9 +16,16 @@ tested on Arch-based distributions (CachyOS, EndeavourOS).
 
 ## Screenshots
 
-<!-- Drop images in docs/screenshots/ and reference them here, or link externally -->
+![Terminal](docs/screenshots/terminal.webp)
+![Lock screen](docs/screenshots/lockscreen.png)
 
-<!-- ![Desktop](docs/screenshots/desktop.png) -->
+| Screen | Image |
+|--------|-------|
+| Desktop | [desktop.webp](docs/screenshots/desktop.webp) |
+| Home (overview) | [home.webp](docs/screenshots/home.webp) |
+| App launcher | [app-launcher.webp](docs/screenshots/app-launcher.webp) |
+| System monitor | [system-monitor.webp](docs/screenshots/system-monitor.webp) |
+| VSCode | [vscode.png](docs/screenshots/vscode.png) |
 
 ## Prerequisites
 
