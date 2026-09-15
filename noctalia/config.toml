@@ -25,7 +25,7 @@ enabled            = true
 fingerprint        = true
 blurred_desktop    = false
 tint_intensity     = 0.0
-wallpaper          = "/home/william/.config/noctalia/lockscreen-bg.png"
+wallpaper          = "~/.config/noctalia/lockscreen-bg.png"
 monitors           = ["DP-3"]
 
 [lockscreen_widgets]

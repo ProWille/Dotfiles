@@ -6,15 +6,10 @@ bindkey -e
 # End of lines configured by zsh-newuser-install
 
 # The following lines were added by compinstall
-zstyle :compinstall filename '/home/william/.zshrc'
-
 autoload -Uz compinit
 compinit
 # End of lines added by compinstall
 
-#fastfetch --config ~/.config/fastfetch/ascii-config.jsonc
-#fastfetch --config ~/.config/fastfetch/png-config.jsonc
-#fastfetch --config ~/.config/fastfetch/shuf-config.jsonc
 fastfetch
 
 # If you come from bash you might have to change your $PATH.

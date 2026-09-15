@@ -5,12 +5,18 @@
 --
 -- Detection order:
 --   1. ~/.config/machine   -- if present, its first line names the preset
---   2. /etc/hostname       -- "William-Laptop" -> laptop
+--   2. DRM scan            -- any eDP-*/LVDS-* connector present => laptop
 --   3. anything else       -- pc (fallback / default)
 --
 -- Override for new machines:
 --   echo pc > ~/.config/machine     # e.g. a desktop
 --   echo laptop > ~/.config/machine # e.g. a laptop
+--
+-- The DRM scan treats a built-in display panel (eDP/LVDS) as the laptop
+-- signal, so no hostname matching is needed. If io.popen is unavailable
+-- it degrades to the marker / pc fallback.
+--
+-- To add your own preset, define the corresponding entry in PRESETS.
 
 local function read_first_line(path)
     local f = io.open(path, "r")
@@ -22,14 +28,23 @@ local function read_first_line(path)
     return line
 end
 
+local function has_internal_panel()
+    local ok, p = pcall(io.popen, "ls /sys/class/drm/ 2>/dev/null | grep -E 'eDP-|LVDS-'")
+    if not ok or not p then
+        return false
+    end
+    local line = p:read("*l")
+    p:close()
+    return line ~= nil
+end
+
 local function detect_host()
     local marker = read_first_line(os.getenv("HOME") .. "/.config/machine")
     if marker and marker ~= "" then
         return marker
     end
 
-    local hostname = read_first_line("/etc/hostname") or ""
-    if hostname:match("^William%-Laptop") then
+    if has_internal_panel() then
         return "laptop"
     end
 
