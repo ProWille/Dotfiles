@@ -74,15 +74,18 @@ local PRESETS = {
               disabled  = false },
         },
 
-        -- persistent workspaces: 1-5 main, 6 second, 7 third
+        -- persistent workspaces: 1-8 main, 9 second, 10 third
         workspaces = {
-            ["1"] = "DP-3",
-            ["2"] = "DP-3",
-            ["3"] = "DP-3",
-            ["4"] = "DP-3",
-            ["5"] = "DP-3",
-            ["6"] = "DP-2",
-            ["7"] = "HDMI-A-1",
+            ["1"]  = "DP-3",
+            ["2"]  = "DP-3",
+            ["3"]  = "DP-3",
+            ["4"]  = "DP-3",
+            ["5"]  = "DP-3",
+            ["6"]  = "DP-3",
+            ["7"]  = "DP-3",
+            ["8"]  = "DP-3",
+            ["9"]  = "DP-2",
+            ["10"] = "HDMI-A-1",
         },
 
         default_monitor = "DP-3",
@@ -104,14 +107,18 @@ local PRESETS = {
               disabled  = false },
         },
 
-        -- persistent workspaces: 1-5 built-in panel, 6 external HDMI
+        -- persistent workspaces: 1-9 built-in panel, 10 external HDMI
         workspaces = {
-            ["1"] = "eDP-1",
-            ["2"] = "eDP-1",
-            ["3"] = "eDP-1",
-            ["4"] = "eDP-1",
-            ["5"] = "eDP-1",
-            ["6"] = "HDMI-A-1",
+            ["1"]  = "eDP-1",
+            ["2"]  = "eDP-1",
+            ["3"]  = "eDP-1",
+            ["4"]  = "eDP-1",
+            ["5"]  = "eDP-1",
+            ["6"]  = "eDP-1",
+            ["7"]  = "eDP-1",
+            ["8"]  = "eDP-1",
+            ["9"]  = "eDP-1",
+            ["10"] = "HDMI-A-1",
         },
 
         default_monitor = "eDP-1",
