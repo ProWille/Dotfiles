@@ -269,3 +269,8 @@ Noctalia run and are machine-specific:
   default; uncomment for NVIDIA GPUs.
 - The `widgets/command_output_nvidia.txt` file is a desktop-widget helper
   for NVIDIA cards — PC-only, not required.
+
+## License
+
+MIT — see [LICENSE](LICENSE). Your configs and scripts are yours; third-party
+bundled assets (fonts, themes, images) remain under their original licenses.
