@@ -54,8 +54,10 @@ distros; this list reflects CachyOS / EndeavourOS repositories.
 fc-cache -f
 ```
 
-Cursor theme: install `bibata-cursor-theme` (provided by the `bibata-cursor-theme`
-package) — the config sets `Bibata-Modern-Ice`.
+Cursor theme: `bibata-cursor-theme` is **not in the official repos** (AUR /
+chaotic-aur only). If you want `Bibata-Modern-Ice` the config references, install
+it manually after setup, e.g. `paru -S bibata-cursor-theme`. Without it, Hyprland
+falls back to a default cursor — everything still works.
 
 **Optional**
 

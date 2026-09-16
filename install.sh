@@ -106,7 +106,7 @@ fi
 if [ "$DO_DEPS" = true ]; then
   echo "==> Dependencies"
   REQUIRED=(hyprland noctalia kitty hyprlauncher dolphin firefox easyeffects
-            xorg-xrandr playerctl bibata-cursor-theme hyprpolkitagent)
+            xorg-xrandr playerctl hyprpolkitagent)
   if [ "$DO_OPENRGB" = true ]; then
     REQUIRED+=(openrgb)
   fi
