@@ -24,7 +24,7 @@ tested on Arch-based distributions (CachyOS, EndeavourOS).
 | Home (overview) | [home.webp](docs/screenshots/home.webp) |
 | App launcher | [app-launcher.webp](docs/screenshots/app-launcher.webp) |
 | System monitor | [system-monitor.webp](docs/screenshots/system-monitor.webp) |
-| VSCode | [vscode.png](docs/screenshots/vscode.png) |
+| VSCode | [vscode.webp](docs/screenshots/vscode.webp) |
 
 ## Prerequisites
 
