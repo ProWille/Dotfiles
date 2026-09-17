@@ -128,6 +128,15 @@ fi
 # alias grep='grep --color=auto'
 
 # Helpful aliases
+# pacman wrapper used by the aliases below (paru -> yay -> pacman)
+if command -v paru >/dev/null 2>&1; then
+    aurhelper=paru
+elif command -v yay >/dev/null 2>&1; then
+    aurhelper=yay
+else
+    aurhelper=pacman
+fi
+
 alias c='clear'                                                        # clear terminal
 alias l='eza -lh --icons=auto'                                         # long list
 alias ls='eza -1 --icons=auto'                                         # short list
