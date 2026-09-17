@@ -5,7 +5,6 @@ fuzzel/
 yazi/
 gtk-3.0/
 gtk-4.0/
-hypr/noctalia.lua
 hypr/hyprtoolkit.conf
 
 # Optional per-host override file (defines the host preset)
