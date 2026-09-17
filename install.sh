@@ -7,6 +7,7 @@ TS="$(date +%Y%m%d-%H%M%S)"
 DRY_RUN=false
 DO_BACKUP=true
 OPENRGB_FLAG="auto"
+NVIDIA_FLAG="auto"
 DO_DEPS=true
 DO_GITCONFIG=false
 DO_ASK=true
@@ -17,6 +18,8 @@ for arg in "$@"; do
     --no-backup)      DO_BACKUP=false ;;
     --no-openrgb)     OPENRGB_FLAG="off" ;;
     --openrgb)        OPENRGB_FLAG="on" ;;
+    --no-nvidia)      NVIDIA_FLAG="off" ;;
+    --nvidia)         NVIDIA_FLAG="on" ;;
     --skip-deps)      DO_DEPS=false ;;
     --with-gitconfig) DO_GITCONFIG=true ;;
     --yes)            DO_ASK=false ;;
@@ -27,6 +30,8 @@ for arg in "$@"; do
       echo "  --no-backup       overwrite existing files without backing them up"
       echo "  --no-openrgb      skip the PC-only OpenRGB systemd units"
       echo "  --openrgb         deploy OpenRGB units even on a laptop"
+      echo "  --no-nvidia       skip NVIDIA env vars even if an NVIDIA GPU is detected"
+      echo "  --nvidia          uncomment NVIDIA env vars even on a non-NVIDIA machine"
       echo "  --skip-deps       don't check or install packages"
       echo "  --with-gitconfig  also deploy ~/.gitconfig"
       echo "  --yes             skip the first-run confirmation prompt"
@@ -58,6 +63,28 @@ if ls /sys/class/drm/ 2>/dev/null | grep -qE 'eDP-|LVDS-'; then
   HOST="laptop"
 fi
 echo "    this machine is a $HOST"
+
+HAS_NVIDIA=false
+if lspci 2>/dev/null | grep -qi nvidia; then
+  HAS_NVIDIA=true
+fi
+
+case "$NVIDIA_FLAG" in
+  on)  DO_NVIDIA=true ;;
+  off) DO_NVIDIA=false ;;
+  auto)
+    if [ "$HAS_NVIDIA" = true ]; then
+      DO_NVIDIA=true
+    else
+      DO_NVIDIA=false
+    fi
+    ;;
+esac
+if [ "$DO_NVIDIA" = true ]; then
+  echo "    NVIDIA env vars: enabled"
+else
+  echo "    NVIDIA env vars: skipped"
+fi
 
 case "$OPENRGB_FLAG" in
   on)  DO_OPENRGB=true ;;
@@ -109,6 +136,9 @@ if [ "$DO_DEPS" = true ]; then
             xorg-xrandr playerctl hyprpolkitagent zsh eza fastfetch git)
   if [ "$DO_OPENRGB" = true ]; then
     REQUIRED+=(openrgb)
+  fi
+  if [ "$DO_NVIDIA" = true ]; then
+    REQUIRED+=(nvidia-utils)
   fi
   MISSING=()
   for pkg in "${REQUIRED[@]}"; do
@@ -279,6 +309,18 @@ if [ "$DRY_RUN" = false ] && [ "$DO_ASK" = true ] && [ "${#EXISTING[@]}" -gt 0 ]
 fi
 
 deploy_dir  "$REPO_DIR/hypr"                  "$HOME/.config/hypr"
+
+ENV_FILE="$HOME/.config/hypr/modules/env.lua"
+if [ "$DO_NVIDIA" = true ] && [ -f "$ENV_FILE" ]; then
+  if [ "$DRY_RUN" = true ]; then
+    echo "    [dry-run] uncomment NVIDIA env vars in $ENV_FILE"
+  else
+    sed -i 's/^--hl\.env("__GLX_VENDOR_LIBRARY_NAME", "nvidia")/hl.env("__GLX_VENDOR_LIBRARY_NAME", "nvidia")/' "$ENV_FILE"
+    sed -i 's/^--hl\.env("LIBVA_DRIVER_NAME", "nvidia")/hl.env("LIBVA_DRIVER_NAME", "nvidia")/' "$ENV_FILE"
+    echo "    uncommented NVIDIA env vars in $ENV_FILE"
+  fi
+fi
+
 deploy_dir  "$REPO_DIR/kitty"                 "$HOME/.config/kitty"
 deploy_dir  "$REPO_DIR/fastfetch"             "$HOME/.config/fastfetch"
 deploy_noctalia "$REPO_DIR/noctalia/config.toml" "$HOME/.config/noctalia/config.toml"
@@ -351,6 +393,9 @@ echo "==> Done"
 echo "    Log out and pick the Hyprland session to start."
 if [ "$HOST" = "pc" ]; then
   echo "    PC-only: systemctl --user enable openrgb.service openrgb-quit.service"
+fi
+if [ "$DO_NVIDIA" = true ]; then
+  echo "    NVIDIA: log out and back in for the env vars to take effect."
 fi
 if [ "$DO_BACKUP" = true ]; then
   echo "    Previous files are available as .bak-$TS if anything looks wrong."

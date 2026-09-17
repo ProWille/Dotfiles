@@ -69,7 +69,7 @@ falls back to a default cursor — everything still works.
 |---------|---------|
 | `openrgb` | PC-only; systemd units provided in repo |
 | `hyprpolkitagent` | Polkit UI |
-| `nvidia-utils` + uncomment env vars in `hypr/modules/env.lua` | NVIDIA GPUs |
+| `nvidia-utils` (installed automatically on NVIDIA systems) | NVIDIA GPUs |
 
 ## Setup
 
@@ -93,9 +93,12 @@ The installer:
    (`paru` or `yay` if present, otherwise `pacman`);
 2. detects whether this is a laptop or a desktop from the display hardware
    (any `eDP-*` / `LVDS-*` connector => laptop) and writes `~/.config/machine`;
-3. backs up any existing target files to `.bak-<timestamp>` and deploys the
+3. detects NVIDIA GPUs via `lspci` and, if found, uncomments the NVIDIA env
+   vars in the deployed `hypr/modules/env.lua` and adds `nvidia-utils` to the
+   dependency check (override with `--nvidia` / `--no-nvidia`);
+4. backs up any existing target files to `.bak-<timestamp>` and deploys the
    configs;
-4. sets up the shell stack if missing: clones Oh My Zsh to `~/.oh-my-zsh`
+5. sets up the shell stack if missing: clones Oh My Zsh to `~/.oh-my-zsh`
    plus the powerlevel10k theme and the `zsh-autosuggestions`,
    `zsh-syntax-highlighting`, and `zsh-completions` plugins (all skip-if-present,
    so re-runs are a no-op). `.zshrc` is still deployed from the repo — the raw
@@ -109,6 +112,8 @@ Flags:
 | `--no-backup` | overwrite existing files without backing them up |
 | `--no-openrgb` | skip the PC-only OpenRGB systemd units |
 | `--openrgb` | deploy OpenRGB units even on a laptop |
+| `--no-nvidia` | skip NVIDIA env vars even if an NVIDIA GPU is detected |
+| `--nvidia` | uncomment NVIDIA env vars even on a non-NVIDIA machine |
 | `--skip-deps` | don't check or install packages |
 | `--with-gitconfig` | also deploy `~/.gitconfig` |
 | `--yes` | skip the first-run confirmation prompt |
@@ -295,7 +300,8 @@ even though Noctalia regenerates it at runtime.
   `The Last Shuriken` — if you changed it, update the font family in
   `noctalia/config.toml` (under `[lockscreen_widgets.widget.clock_*]`).
 - The NVIDIA env vars in `hypr/modules/env.lua` are commented out by
-  default; uncomment for NVIDIA GPUs.
+  default; `install.sh` uncomments them automatically when it detects an
+  NVIDIA GPU (see the `--nvidia` / `--no-nvidia` flags).
 - The `widgets/command_output_nvidia.txt` file is a desktop-widget helper
   for NVIDIA cards — PC-only, not required.
 
