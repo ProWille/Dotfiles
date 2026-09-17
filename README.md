@@ -12,7 +12,6 @@ tested on Arch-based distributions (CachyOS, EndeavourOS).
 - Host-aware monitor presets — same repo, multiple machines
 - Themed kitty, fastfetch, VSCode (workspace Lua LSP stubs)
 - Shell prompt (powerlevel10k) with customised git/tool segments
-- Optional OpenRGB integration for systemd (PC use)
 
 ## Screenshots
 
@@ -67,7 +66,6 @@ falls back to a default cursor — everything still works.
 
 | Package | Purpose |
 |---------|---------|
-| `openrgb` | PC-only; systemd units provided in repo |
 | `hyprpolkitagent` | Polkit UI |
 | `nvidia-utils` (installed automatically on NVIDIA systems) | NVIDIA GPUs |
 
@@ -110,12 +108,12 @@ Flags:
 |------|--------|
 | `--dry-run` | print what would happen without changing anything |
 | `--no-backup` | overwrite existing files without backing them up |
-| `--no-openrgb` | skip the PC-only OpenRGB systemd units |
-| `--openrgb` | deploy OpenRGB units even on a laptop |
 | `--no-nvidia` | skip NVIDIA env vars even if an NVIDIA GPU is detected |
 | `--nvidia` | uncomment NVIDIA env vars even on a non-NVIDIA machine |
 | `--skip-deps` | don't check or install packages |
 | `--with-gitconfig` | also deploy `~/.gitconfig` |
+| `--openrgb-startup=NAME` | apply OpenRGB profile NAME at session start (optional) |
+| `--openrgb-exit=NAME` | apply OpenRGB profile NAME on logout/reboot/shutdown (optional) |
 | `--yes` | skip the first-run confirmation prompt |
 
 The installer checks for required packages and optionally installs any that are
@@ -160,6 +158,13 @@ same laptop/pc detection as `host.lua`). The placeholder tokens are:
 | `@@CB_CX@@` / `@@CB_CY@@` | clock_big center |
 | `@@CD_CX@@` / `@@CD_CY@@` | clock_date center |
 | `@@LB_CX@@` / `@@LB_CY@@` / `@@LB_W@@` | login_box center + width |
+| `@@OPENRGB_LOGOUT@@` | Noctalia hook command run at logout/reboot/shutdown |
+
+For the Noctalia hooks, `@@OPENRGB_LOGOUT@@` is additionally filled in by
+`install.sh`: it becomes `openrgb --nodetect --profile NAME` when
+`--openrgb-exit=NAME` is given (an OpenRGB exit-profile command) or the
+no-op `true` otherwise. `scripts/startup.sh` likewise has a `@@ORGB_STARTUP@@`
+placeholder rendered from `--openrgb-startup=NAME`.
 
 If you deploy manually, substitute them yourself, e.g. for a laptop:
 
@@ -215,23 +220,6 @@ git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting \
 git clone --depth=1 https://github.com/zsh-users/zsh-completions \
   ~/.oh-my-zsh/custom/plugins/zsh-completions
 ```
-
-### OpenRGB (PC only, optional)
-
-`install.sh` deploys the OpenRGB systemd units **only on desktops** by default
-(it runs the same laptop/pc detection as `host.lua`). On a laptop, pass
-`--openrgb` to force them. Manual setup:
-
-```sh
-mkdir -p ~/.config/systemd/user
-cp systemd/user/openrgb.service systemd/user/openrgb-quit.service \
-   ~/.config/systemd/user/
-systemctl --user daemon-reload
-systemctl --user enable openrgb.service openrgb-quit.service
-```
-
-Place your OpenRGB profile (e.g. `Zones.orp`) somewhere on disk and update
-the `ExecStart` line in `openrgb.service` to match its path.
 
 ### Git config (optional)
 
@@ -302,6 +290,14 @@ even though Noctalia regenerates it at runtime.
 - The NVIDIA env vars in `hypr/modules/env.lua` are commented out by
   default; `install.sh` uncomments them automatically when it detects an
   NVIDIA GPU (see the `--nvidia` / `--no-nvidia` flags).
+- Session startup extras — OpenRGB and EasyEffects — are launched from
+  `~/.local/bin/startup.sh`, which Noctalia runs once via its `started` hook
+  (`[hooks]` in `noctalia/config.toml`). OpenRGB starts with its SDK server
+  enabled; if you passed `--openrgb-exit=NAME`, the same Noctalia hooks apply
+  that profile at logout/reboot/shutdown via `openrgb --nodetect` (no rescan —
+  it connects to the running server). Both apps are optional: the startup
+  script skips either silently when not installed, and without the
+  `--openrgb-*` flags no profile is forced at all.
 - The `widgets/command_output_nvidia.txt` file is a desktop-widget helper
   for NVIDIA cards — PC-only, not required.
 

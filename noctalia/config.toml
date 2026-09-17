@@ -86,3 +86,12 @@ show_unlock_hint   = false
 [shell.screenshot]
 save_to_file    = true
 copy_to_clipboard = true
+
+# Session startup extras (OpenRGB + EasyEffects) - see scripts/startup.sh.
+# @@OPENRGB_LOGOUT@@ is filled in by install.sh: an "openrgb --nodetect
+# --profile NAME" command when --openrgb-exit is given, "true" otherwise.
+[hooks]
+started = "~/.local/bin/startup.sh"
+logging_out = "@@OPENRGB_LOGOUT@@"
+rebooting = "@@OPENRGB_LOGOUT@@"
+shutting_down = "@@OPENRGB_LOGOUT@@"

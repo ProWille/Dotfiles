@@ -1,7 +1,0 @@
-[Unit]
-Description=OpenRGB RGB control
-[Service]
-ExecStartPre=/usr/bin/sleep 3
-ExecStart=/usr/bin/openrgb --startminimized --profile Zones.orp
-[Install]
-WantedBy=default.target

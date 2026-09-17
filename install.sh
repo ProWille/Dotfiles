@@ -6,34 +6,38 @@ TS="$(date +%Y%m%d-%H%M%S)"
 
 DRY_RUN=false
 DO_BACKUP=true
-OPENRGB_FLAG="auto"
 NVIDIA_FLAG="auto"
 DO_DEPS=true
 DO_GITCONFIG=false
 DO_ASK=true
+# Optional OpenRGB profile automation. Empty (default) keeps OpenRGB
+# fully optional: it is not in REQUIRED and no profile is ever forced.
+# Set via --openrgb-startup/--openrgb-exit or edit these right here.
+OPENRGB_STARTUP_PROFILE=""
+OPENRGB_EXIT_PROFILE=""
 
 for arg in "$@"; do
   case "$arg" in
     --dry-run)        DRY_RUN=true ;;
     --no-backup)      DO_BACKUP=false ;;
-    --no-openrgb)     OPENRGB_FLAG="off" ;;
-    --openrgb)        OPENRGB_FLAG="on" ;;
     --no-nvidia)      NVIDIA_FLAG="off" ;;
     --nvidia)         NVIDIA_FLAG="on" ;;
     --skip-deps)      DO_DEPS=false ;;
     --with-gitconfig) DO_GITCONFIG=true ;;
+    --openrgb-startup=*) OPENRGB_STARTUP_PROFILE="${arg#*=}" ;;
+    --openrgb-exit=*)    OPENRGB_EXIT_PROFILE="${arg#*=}" ;;
     --yes)            DO_ASK=false ;;
     -h|--help)
       echo "Usage: bash install.sh [flags]"
       echo ""
       echo "  --dry-run         print actions without changing anything"
       echo "  --no-backup       overwrite existing files without backing them up"
-      echo "  --no-openrgb      skip the PC-only OpenRGB systemd units"
-      echo "  --openrgb         deploy OpenRGB units even on a laptop"
       echo "  --no-nvidia       skip NVIDIA env vars even if an NVIDIA GPU is detected"
       echo "  --nvidia          uncomment NVIDIA env vars even on a non-NVIDIA machine"
       echo "  --skip-deps       don't check or install packages"
       echo "  --with-gitconfig  also deploy ~/.gitconfig"
+      echo "  --openrgb-startup=NAME  apply OpenRGB profile NAME at session start (optional)"
+      echo "  --openrgb-exit=NAME     apply OpenRGB profile NAME on logout/reboot/shutdown (optional)"
       echo "  --yes             skip the first-run confirmation prompt"
       exit 0
       ;;
@@ -86,23 +90,6 @@ else
   echo "    NVIDIA env vars: skipped"
 fi
 
-case "$OPENRGB_FLAG" in
-  on)  DO_OPENRGB=true ;;
-  off) DO_OPENRGB=false ;;
-  auto)
-    if [ "$HOST" = "pc" ]; then
-      DO_OPENRGB=true
-    else
-      DO_OPENRGB=false
-    fi
-    ;;
-esac
-if [ "$DO_OPENRGB" = true ]; then
-  echo "    OpenRGB units: enabled"
-else
-  echo "    OpenRGB units: skipped (desktop-only by default; use --openrgb to force)"
-fi
-
 case "$HOST" in
   laptop)
     N_MAIN="eDP-1"
@@ -134,9 +121,6 @@ if [ "$DO_DEPS" = true ]; then
   echo "==> Dependencies"
   REQUIRED=(hyprland noctalia kitty hyprlauncher dolphin firefox easyeffects
             xorg-xrandr playerctl hyprpolkitagent zsh eza fastfetch git)
-  if [ "$DO_OPENRGB" = true ]; then
-    REQUIRED+=(openrgb)
-  fi
   if [ "$DO_NVIDIA" = true ]; then
     REQUIRED+=(nvidia-utils)
   fi
@@ -260,6 +244,10 @@ deploy_noctalia() {
   if [ "$DRY_RUN" = true ]; then
     echo "    [dry-run] render $src -> $dest (host=$HOST)"
   else
+    ORGB_LOGOUT="true"
+    if [ -n "$OPENRGB_EXIT_PROFILE" ]; then
+      ORGB_LOGOUT="openrgb --nodetect --profile $OPENRGB_EXIT_PROFILE"
+    fi
     sed -e "s|@@MAIN@@|$N_MAIN|g" \
         -e "s|@@CB_CX@@|$N_CB_CX|g" \
         -e "s|@@CB_CY@@|$N_CB_CY|g" \
@@ -268,8 +256,41 @@ deploy_noctalia() {
         -e "s|@@LB_CX@@|$N_LB_CX|g" \
         -e "s|@@LB_CY@@|$N_LB_CY|g" \
         -e "s|@@LB_W@@|$N_LB_W|g" \
+        -e "s|@@OPENRGB_LOGOUT@@|$ORGB_LOGOUT|g" \
         "$src" > "$dest"
     echo "    rendered $src -> $dest (host=$HOST)"
+  fi
+}
+
+deploy_startup() {
+  local src="$1" dest="$2"
+  if [ ! -e "$src" ]; then
+    echo "    skip  $dest (no $src in repo)"
+    return
+  fi
+  mkdir -p "$(dirname "$dest")"
+  if [ -e "$dest" ]; then
+    if [ "$DO_BACKUP" = true ]; then
+      if [ "$DRY_RUN" = true ]; then
+        echo "    [dry-run] backup $dest -> $dest.bak-$TS"
+      else
+        mv "$dest" "$dest.bak-$TS"
+        echo "    backed up $dest -> $dest.bak-$TS"
+      fi
+    else
+      rm -rf "$dest"
+    fi
+  fi
+  ORGB_ARGS=""
+  if [ -n "$OPENRGB_STARTUP_PROFILE" ]; then
+    ORGB_ARGS="--profile $OPENRGB_STARTUP_PROFILE"
+  fi
+  if [ "$DRY_RUN" = true ]; then
+    echo "    [dry-run] render $src -> $dest"
+  else
+    sed -e "s|@@ORGB_STARTUP@@|$ORGB_ARGS|g" "$src" > "$dest"
+    chmod +x "$dest"
+    echo "    rendered $src -> $dest"
   fi
 }
 
@@ -283,10 +304,8 @@ CONFIRM_TARGETS=(
   "$HOME/.config/noctalia/lockscreen-bg.png"
   "$HOME/.zshrc"
   "$HOME/.p10k.zsh"
+  "$HOME/.local/bin/startup.sh"
 )
-if [ "$DO_OPENRGB" = true ]; then
-  CONFIRM_TARGETS+=("$HOME/.config/systemd/user/openrgb.service" "$HOME/.config/systemd/user/openrgb-quit.service")
-fi
 if [ "$DO_GITCONFIG" = true ]; then
   CONFIRM_TARGETS+=("$HOME/.gitconfig")
 fi
@@ -333,18 +352,10 @@ for f in "$REPO_DIR"/fonts/*.ttf; do
   deploy_file "$f" "$HOME/.local/share/fonts/$(basename "$f")"
 done
 
+deploy_startup "$REPO_DIR/scripts/startup.sh" "$HOME/.local/bin/startup.sh"
+
 if [ "$DO_GITCONFIG" = true ]; then
   deploy_file "$REPO_DIR/.gitconfig" "$HOME/.gitconfig"
-fi
-
-DEPLOYED_SYSTEMD=false
-if [ "$DO_OPENRGB" = true ]; then
-  for unit in openrgb.service openrgb-quit.service; do
-    if [ -f "$REPO_DIR/systemd/user/$unit" ]; then
-      deploy_file "$REPO_DIR/systemd/user/$unit" "$HOME/.config/systemd/user/$unit"
-      DEPLOYED_SYSTEMD=true
-    fi
-  done
 fi
 
 echo "==> Shell setup (Oh My Zsh)"
@@ -374,14 +385,6 @@ git_clone_if_missing "https://github.com/zsh-users/zsh-completions.git" "$OMZ/cu
 unset OMZ
 
 echo "==> Post-install"
-if [ "$DEPLOYED_SYSTEMD" = true ]; then
-  if [ "$DRY_RUN" = true ]; then
-    echo "    [dry-run] systemctl --user daemon-reload"
-  else
-    systemctl --user daemon-reload
-    echo "    systemctl --user daemon-reload"
-  fi
-fi
 if [ "$DRY_RUN" = true ]; then
   echo "    [dry-run] fc-cache -f"
 else
@@ -391,9 +394,6 @@ fi
 
 echo "==> Done"
 echo "    Log out and pick the Hyprland session to start."
-if [ "$HOST" = "pc" ]; then
-  echo "    PC-only: systemctl --user enable openrgb.service openrgb-quit.service"
-fi
 if [ "$DO_NVIDIA" = true ]; then
   echo "    NVIDIA: log out and back in for the env vars to take effect."
 fi
