@@ -106,7 +106,7 @@ fi
 if [ "$DO_DEPS" = true ]; then
   echo "==> Dependencies"
   REQUIRED=(hyprland noctalia kitty hyprlauncher dolphin firefox easyeffects
-            xorg-xrandr playerctl hyprpolkitagent)
+            xorg-xrandr playerctl hyprpolkitagent zsh eza fastfetch git)
   if [ "$DO_OPENRGB" = true ]; then
     REQUIRED+=(openrgb)
   fi
@@ -304,6 +304,32 @@ if [ "$DO_OPENRGB" = true ]; then
     fi
   done
 fi
+
+echo "==> Shell setup (Oh My Zsh)"
+git_clone_if_missing() {
+  local url="$1" dir="$2"
+  if [ -d "$dir/.git" ]; then
+    echo "    present  $dir"
+    return
+  fi
+  if [ -e "$dir" ]; then
+    echo "    WARNING incomplete clone at $dir - re-cloning"
+    [ "$DRY_RUN" = true ] || rm -rf "$dir"
+  fi
+  if [ "$DRY_RUN" = true ]; then
+    echo "    [dry-run] git clone $url $dir"
+  else
+    git clone --depth=1 "$url" "$dir"
+    echo "    cloned   $dir"
+  fi
+}
+OMZ="$HOME/.oh-my-zsh"
+git_clone_if_missing "https://github.com/ohmyzsh/ohmyzsh.git" "$OMZ"
+git_clone_if_missing "https://github.com/romkatv/powerlevel10k.git" "$OMZ/custom/themes/powerlevel10k"
+git_clone_if_missing "https://github.com/zsh-users/zsh-autosuggestions.git" "$OMZ/custom/plugins/zsh-autosuggestions"
+git_clone_if_missing "https://github.com/zsh-users/zsh-syntax-highlighting.git" "$OMZ/custom/plugins/zsh-syntax-highlighting"
+git_clone_if_missing "https://github.com/zsh-users/zsh-completions.git" "$OMZ/custom/plugins/zsh-completions"
+unset OMZ
 
 echo "==> Post-install"
 if [ "$DEPLOYED_SYSTEMD" = true ]; then

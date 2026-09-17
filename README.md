@@ -45,6 +45,10 @@ distros; this list reflects CachyOS / EndeavourOS repositories.
 | `easyeffects` | System-wide audio effects |
 | `xorg-xrandr` | xrandr used at autostart for primary output |
 | `playerctl` | Media key handling |
+| `zsh` | Default shell; used by `install.sh` (Oh My Zsh setup) and `.zshrc` |
+| `eza` | Modern `ls` replacement used in aliases |
+| `fastfetch` | System fetch shown at shell start |
+| `git` | Required to clone Oh My Zsh / theme / plugins during install |
 
 **Fonts / cursors**
 
@@ -90,7 +94,12 @@ The installer:
 2. detects whether this is a laptop or a desktop from the display hardware
    (any `eDP-*` / `LVDS-*` connector => laptop) and writes `~/.config/machine`;
 3. backs up any existing target files to `.bak-<timestamp>` and deploys the
-   configs.
+   configs;
+4. sets up the shell stack if missing: clones Oh My Zsh to `~/.oh-my-zsh`
+   plus the powerlevel10k theme and the `zsh-autosuggestions`,
+   `zsh-syntax-highlighting`, and `zsh-completions` plugins (all skip-if-present,
+   so re-runs are a no-op). `.zshrc` is still deployed from the repo — the raw
+   Oh My Zsh clone does **not** replace it.
 
 Flags:
 
@@ -183,6 +192,21 @@ cp .zshrc .p10k.zsh ~/.zshrc  # watch for existing .zshrc — back up first
 ```
 
 The `.p10k.zsh` is a large generated file; place it in `~/.p10k.zsh`.
+
+The shell config also assumes Oh My Zsh plus the powerlevel10k theme and
+plugins are installed — see step 4 of the installer, or set them up manually:
+
+```sh
+git clone --depth=1 https://github.com/ohmyzsh/ohmyzsh.git ~/.oh-my-zsh
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git \
+  ~/.oh-my-zsh/custom/themes/powerlevel10k
+git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions \
+  ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions
+git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting \
+  ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
+git clone --depth=1 https://github.com/zsh-users/zsh-completions \
+  ~/.oh-my-zsh/custom/plugins/zsh-completions
+```
 
 ### OpenRGB (PC only, optional)
 
