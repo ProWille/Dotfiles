@@ -51,11 +51,19 @@ distros; this list reflects CachyOS / EndeavourOS repositories.
 
 **Fonts / cursors**
 
+The lock screen clock uses the `The Last Shuriken` font, which is **free for
+personal use only** — not freely redistributable — so it is **not shipped in
+this repo**. Install it manually (download it from
+[dafont.com/the-last-shuriken.font](https://www.dafont.com/the-last-shuriken.font)
+and move the `.ttf` into `~/.local/share/fonts/`), then refresh the cache:
+
 ```sh
-# "The Last Shuriken" lockscreen clock font is included in fonts/
-# After deploying, refresh the font cache:
 fc-cache -f
 ```
+
+`install.sh` deploys any `.ttf` files you drop into `fonts/`. Without the
+font, the clock falls back to `sans-serif` (fontconfig resolves it, e.g. Noto
+Sans) and everything still works.
 
 Cursor theme: `bibata-cursor-theme` is **not in the official repos** (AUR /
 chaotic-aur only). If you want `Bibata-Modern-Ice` the config references, install
@@ -189,9 +197,14 @@ the Settings UI writes it to `~/.local/state/noctalia/settings.toml`.
 
 ### Fonts
 
+The `The Last Shuriken` lock screen clock font is **not shipped** — its
+personal-use-only licence doesn't allow redistribution (see the Fonts note in
+[Prerequisites](#prerequisites)). `install.sh` only deploys fonts when you add
+your own `.ttf` files to `fonts/`. To install the clock font manually:
+
 ```sh
 mkdir -p ~/.local/share/fonts
-cp fonts/*.ttf ~/.local/share/fonts/
+mv ~/Downloads/TheLastShuriken.ttf ~/.local/share/fonts/
 fc-cache -f
 ```
 
@@ -284,9 +297,11 @@ even though Noctalia regenerates it at runtime.
 
 - Idle behaviour: Noctalia dims at 5 min, locks at 10 min, locks-and-suspends
   at 15 min. All configured in `noctalia/config.toml`.
-- The lock screen clock font must be installed and available as
-  `The Last Shuriken` — if you changed it, update the font family in
-  `noctalia/config.toml` (under `[lockscreen_widgets.widget.clock_*]`).
+- The lock screen clock font is `The Last Shuriken` — optional, personal-use
+  licence, not shipped (see the Fonts section). If you change it, update the
+  font family in `noctalia/config.toml` (under
+  `[lockscreen_widgets.widget.clock_*]`); a missing family falls back to
+  `sans-serif`, so nothing breaks.
 - The NVIDIA env vars in `hypr/modules/env.lua` are commented out by
   default; `install.sh` uncomments them automatically when it detects an
   NVIDIA GPU (see the `--nvidia` / `--no-nvidia` flags).

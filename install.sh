@@ -347,10 +347,12 @@ deploy_file "$REPO_DIR/noctalia/lockscreen-bg.png" "$HOME/.config/noctalia/locks
 deploy_file "$REPO_DIR/.zshrc"                "$HOME/.zshrc"
 deploy_file "$REPO_DIR/.p10k.zsh"             "$HOME/.p10k.zsh"
 
-for f in "$REPO_DIR"/fonts/*.ttf; do
-  [ -f "$f" ] || continue
-  deploy_file "$f" "$HOME/.local/share/fonts/$(basename "$f")"
-done
+if compgen -G "$REPO_DIR/fonts/*.ttf" >/dev/null 2>&1; then
+  for f in "$REPO_DIR"/fonts/*.ttf; do
+    [ -f "$f" ] || continue
+    deploy_file "$f" "$HOME/.local/share/fonts/$(basename "$f")"
+  done
+fi
 
 deploy_startup "$REPO_DIR/scripts/startup.sh" "$HOME/.local/bin/startup.sh"
 
