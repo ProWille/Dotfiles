@@ -18,6 +18,8 @@ tested on Arch-based distributions (CachyOS, EndeavourOS).
 ![Terminal](docs/screenshots/terminal.webp)
 ![Lock screen](docs/screenshots/lockscreen.png)
 
+*Lock screen clock uses the optional `The Last Shuriken` font — see [Fonts](#fonts) for how to install it.*
+
 | Screen | Image |
 |--------|-------|
 | Desktop | [desktop.webp](docs/screenshots/desktop.webp) |
@@ -53,9 +55,10 @@ distros; this list reflects CachyOS / EndeavourOS repositories.
 
 The lock screen clock uses the `The Last Shuriken` font, which is **free for
 personal use only** — not freely redistributable — so it is **not shipped in
-this repo**. Install it manually (download it from
-[dafont.com/the-last-shuriken.font](https://www.dafont.com/the-last-shuriken.font)
-and move the `.ttf` into `~/.local/share/fonts/`), then refresh the cache:
+this repo**. Install it manually: download the zip from
+[dafont.com/the-last-shuriken.font](https://www.dafont.com/the-last-shuriken.font),
+extract it, and move `The Last Shuriken.ttf` into `~/.local/share/fonts/`,
+then refresh the cache:
 
 ```sh
 fc-cache -f
@@ -204,8 +207,12 @@ your own `.ttf` files to `fonts/`. To install the clock font manually:
 
 ```sh
 mkdir -p ~/.local/share/fonts
-mv ~/Downloads/TheLastShuriken.ttf ~/.local/share/fonts/
+# dafont delivers a zip — extract it first; the file inside is literally
+# named "The Last Shuriken.ttf" (spaces!), so quote the path:
+mv ~/Downloads/The\ Last\ Shuriken.ttf ~/.local/share/fonts/
 fc-cache -f
+# verify it's picked up:
+fc-match "The Last Shuriken"
 ```
 
 ### Kitty, fastfetch, shell
