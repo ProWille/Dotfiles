@@ -313,8 +313,6 @@ even though Noctalia regenerates it at runtime.
   it connects to the running server). Both apps are optional: the startup
   script skips either silently when not installed, and without the
   `--openrgb-*` flags no profile is forced at all.
-- The `widgets/command_output_nvidia.txt` file is a desktop-widget helper
-  for NVIDIA cards — PC-only, not required.
 
 ## License
 
