@@ -30,8 +30,8 @@ hl.bind(mainMod .. " + R", hl.dsp.exec_cmd(menu))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))    -- dwindle only
 hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("noctalia msg session lock"))
-hl.bind(mainMod .. " + adiaeresis", hl.dsp.exec_cmd(ipc .. " brightness-up"))
-hl.bind(mainMod .. " + odiaeresis", hl.dsp.exec_cmd(ipc .. " brightness-down"))
+hl.bind(mainMod .. " + adiaeresis", hl.dsp.exec_cmd(ipc .. " brightness-up"), { locked = true })
+hl.bind(mainMod .. " + odiaeresis", hl.dsp.exec_cmd(ipc .. " brightness-down"), { locked = true })
 
 -- Move focus with mainMod + arrow keys
 hl.bind(mainMod .. " + left",  hl.dsp.focus({ direction = "left" }))
@@ -85,8 +85,8 @@ hl.bind("Print",         hl.dsp.exec_cmd(ipc .. " screenshot-fullscreen"))
 hl.bind("SHIFT + Print", hl.dsp.exec_cmd(ipc .. " screenshot-region"))
 
 -- Media keys
-hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd(ipc .. " volume-up"))
-hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd(ipc .. " volume-down"))
-hl.bind("XF86AudioMute", hl.dsp.exec_cmd(ipc .. " volume-mute"))
-hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd(ipc .. " brightness-up"))
-hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd(ipc .. " brightness-down"))
+hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd(ipc .. " volume-up"), { locked = true })
+hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd(ipc .. " volume-down"), { locked = true })
+hl.bind("XF86AudioMute", hl.dsp.exec_cmd(ipc .. " volume-mute"), { locked = true })
+hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd(ipc .. " brightness-up"), { locked = true })
+hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd(ipc .. " brightness-down"), { locked = true })
