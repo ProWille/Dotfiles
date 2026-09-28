@@ -31,8 +31,10 @@ hl.bind(mainMod .. " + R", hl.dsp.exec_cmd(menu))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))    -- dwindle only
 hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("noctalia msg session lock"))
-hl.bind(mainMod .. " + adiaeresis", hl.dsp.exec_cmd(ipc .. " brightness-up"), { locked = true })
-hl.bind(mainMod .. " + odiaeresis", hl.dsp.exec_cmd(ipc .. " brightness-down"), { locked = true })
+-- $HOME is required: ~/.local/bin is not on Hyprland's PATH, and a bare name
+-- would fail with "command not found". Binds run via a shell, so $HOME expands.
+hl.bind(mainMod .. " + adiaeresis", hl.dsp.exec_cmd("$HOME/.local/bin/brightness-target.sh up"), { locked = true })
+hl.bind(mainMod .. " + odiaeresis", hl.dsp.exec_cmd("$HOME/.local/bin/brightness-target.sh down"), { locked = true })
 
 -- Move focus with mainMod + arrow keys
 hl.bind(mainMod .. " + left",  hl.dsp.focus({ direction = "left" }))
