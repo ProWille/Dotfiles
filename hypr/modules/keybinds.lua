@@ -93,5 +93,10 @@ hl.bind("SHIFT + Print", hl.dsp.exec_cmd(ipc .. " screenshot-region"))
 hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd(ipc .. " volume-up"), { locked = true })
 hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd(ipc .. " volume-down"), { locked = true })
 hl.bind("XF86AudioMute", hl.dsp.exec_cmd(ipc .. " volume-mute"), { locked = true })
-hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd(ipc .. " brightness-up"), { locked = true })
-hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd(ipc .. " brightness-down"), { locked = true })
+-- Same bare-form failure as the SUPER brightness keys had: noctalia defaults to
+-- the focused output, which has no brightness control when a DDC-less display is
+-- focused. Routed through the wrapper for the same reason -- see the note above
+-- its bind. This is a workaround for this machine's monitor layout, not a fix;
+-- the real fix belongs in Noctalia's own target resolution.
+hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("$HOME/.local/bin/brightness-target.sh up"), { locked = true })
+hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("$HOME/.local/bin/brightness-target.sh down"), { locked = true })
