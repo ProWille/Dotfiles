@@ -23,12 +23,12 @@ hl.bind(mainMod .. " + Z", hl.dsp.exec_cmd(terminal))
 local closeWindowBind = hl.bind(mainMod .. " + X", hl.dsp.window.close())
 -- closeWindowBind:set_enabled(false)
 hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch 'hl.dsp.exit()'"))
-hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(browser))
+hl.bind(mainMod .. " + W", hl.dsp.exec_cmd(browser))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen())
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd(menu))
-hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
+hl.bind(mainMod .. " + T", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))    -- dwindle only
 hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("noctalia msg session lock"))
 -- $HOME is required: ~/.local/bin is not on Hyprland's PATH, and a bare name
@@ -81,6 +81,8 @@ hl.bind(mainMod .. "+ Space", hl.dsp.exec_cmd(ipc .. " panel-toggle launcher"))
 hl.bind(mainMod .. "+ C", hl.dsp.exec_cmd(vscode))
 hl.bind(mainMod .. "+ H", hl.dsp.exec_cmd(ipc .. " panel-toggle control-center"))
 hl.bind(mainMod .. "+ K", hl.dsp.exec_cmd(ipc .. " caffeine-toggle"))
+-- Cycles performance -> power-saver -> balanced -> performance (wraps).
+hl.bind(mainMod .. "+ P", hl.dsp.exec_cmd(ipc .. " power-cycle"), { locked = true })
 hl.bind(mainMod .. "+ comma", hl.dsp.exec_cmd(ipc .. " settings-toggle"))
 
 -- Screenshots
