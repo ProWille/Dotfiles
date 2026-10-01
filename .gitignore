@@ -5,7 +5,9 @@ fuzzel/
 yazi/
 gtk-3.0/
 gtk-4.0/
-hypr/hyprtoolkit.conf
+# hypr/hyprtoolkit.conf used to be listed here, but it is now tracked so a fresh
+# install reproduces the live theme. Expect it to show as modified after a theme
+# switch; re-copy from ~/.config/hypr to resync.
 
 # Optional per-host override file (defines the host preset)
 .config/machine

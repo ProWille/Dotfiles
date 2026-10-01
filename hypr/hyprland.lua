@@ -33,3 +33,6 @@ require("modules.input")
 -- require would make Hyprland fail to start at all.
 local noctalia_ok, noctalia = pcall(require, "noctalia")
 if noctalia_ok then noctalia.apply_theme() end
+
+-- For Noctalia Color templates
+require("noctalia").apply_theme()
