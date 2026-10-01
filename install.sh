@@ -10,11 +10,14 @@ NVIDIA_FLAG="auto"
 DO_DEPS=true
 DO_GITCONFIG=false
 DO_ASK=true
-# Optional OpenRGB profile automation. Empty (default) keeps OpenRGB
-# fully optional: it is not in REQUIRED and no profile is ever forced.
-# Set via --openrgb-startup/--openrgb-exit or edit these right here.
-OPENRGB_STARTUP_PROFILE=""
-OPENRGB_EXIT_PROFILE=""
+# OpenRGB profile automation. OpenRGB stays optional: it is not in REQUIRED and
+# both commands are guarded by 'command -v openrgb' at runtime, so a machine
+# without it is unaffected. These defaults match the live setup (profile "Zones"
+# at session start, profile "Default" on logout) so a fresh install reproduces
+# it; pass --openrgb-startup=NAME / --openrgb-exit=NAME to override, or set them
+# empty here to never force a profile.
+OPENRGB_STARTUP_PROFILE="Zones"
+OPENRGB_EXIT_PROFILE="Default"
 
 for arg in "$@"; do
   case "$arg" in
