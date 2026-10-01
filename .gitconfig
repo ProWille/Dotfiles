@@ -8,3 +8,13 @@
 	visual = !gitk
 [init]
 	defaultBranch = main
+[user]
+	email = william.hirschfeldt@gmail.com
+	name = William Hirschfeldt
+[filter "lfs"]
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
+[core]
+	editor = micro
