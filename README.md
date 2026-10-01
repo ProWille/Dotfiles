@@ -154,8 +154,9 @@ This deploys `hyprland.lua`, all `modules/*.lua` (including `host.lua`),
 generated color-theme file: a copy is shipped so a fresh machine can boot
 Hyprland before Noctalia has ever run (`hyprland.lua` requires it via
 `pcall`), and Noctalia regenerates it at runtime — a newer Noctalia version
-may overwrite it with a slightly different palette. `hyprtoolkit.conf` is
-also Noctalia-generated but is not required at boot, so it is not shipped.
+may overwrite it with a slightly different palette. `hyprtoolkit.conf` is also
+Noctalia-generated but is not required at boot, so nothing requires it to
+exist; it is shipped anyway so the live color template is reproduced.
 
 ### Noctalia config
 
