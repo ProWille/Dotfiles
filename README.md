@@ -294,11 +294,41 @@ are machine-specific; they are not versioned (see `.gitignore`):
 | `fuzzel/` | `~/.config/fuzzel/` |
 | `yazi/` | `~/.config/yazi/` |
 | `gtk-3.0/`, `gtk-4.0/` | `~/.config/gtk-3.0/`, `~/.config/gtk-4.0/` |
-| `hypr/hyprtoolkit.conf` | `~/.config/hypr/hyprtoolkit.conf` |
 
-Exception: `hypr/noctalia.lua` **is** tracked (see "Hyprland config" above) —
-it is shipped as a bootstrap copy so Hyprland can boot on a fresh machine,
-even though Noctalia regenerates it at runtime.
+### Generated, but tracked
+
+Noctalia rewrites these at runtime, so expect them to show as modified after a
+theme switch. They are committed so a fresh install reproduces the current
+look; re-copy from the live path to resync.
+
+| File | Deploy target |
+|------|---------------|
+| `hypr/noctalia.lua` | `~/.config/hypr/noctalia.lua` |
+| `hypr/hyprtoolkit.conf` | `~/.config/hypr/hyprtoolkit.conf` |
+| `kitty/themes/noctalia.conf` | `~/.config/kitty/themes/noctalia.conf` |
+| `fastfetch/themes/noctalia.jsonc` | `~/.config/fastfetch/themes/noctalia.jsonc` |
+
+`hypr/noctalia.lua` is also a bootstrap: Hyprland boots on a fresh machine
+because the file ships with the repo rather than being generated on first run.
+
+## Tests
+
+`tests/brightness-target.sh` exercises `scripts/brightness-target.sh` against
+the real `ddcutil` and `noctalia` binaries. Run it from anywhere:
+
+```bash
+./tests/brightness-target.sh
+```
+
+It is **machine-specific**: it asserts against this machine's monitor layout
+(`DP-3` as the DDC fallback, `HDMI-A-1` as the permanently DDC-less output). On
+other hardware the brightness assertions report `SKIP` rather than a misleading
+pass or fail, though the argument-validation tests still run.
+
+`ddcutil` is an unreliable oracle on this panel — a write sometimes fails to
+land inside the read window — so a "did not dim" assertion is retried a few
+times before it is reported as a failure. A pass still requires an observed
+decrease *and* a clean exit *and* no leaked error text.
 
 ## Notes
 
