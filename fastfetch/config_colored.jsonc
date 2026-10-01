@@ -25,44 +25,39 @@
     },
     {
       "type": "os",
-      "key": " ├   OS         ",
+      "key": " ├   OS       ",
       "keyColor": "red"
     },
     {
       "type": "kernel",
-      "key": " ├   Kernel     ",
-      "keyColor": "red"
-    },
-    {
-      "type": "gpu",
-      "format": "{driver}",
-      "key": " ├ 󰢮  GPU Driver ",
+      "key": " ├   Kernel   ",
       "keyColor": "red"
     },
     {
       "type": "packages",
-      "key": " ├ 󰏖  Packages   ",
+      "format": "{} (pacman)",
+      "key": " ├ 󰏖  Packages ",
       "keyColor": "red"
     },
     {
       "type": "shell",
-      "key": " ├   Shell      ",
+      "key": " ├   Shell    ",
       "keyColor": "red"
     },
     {
       "type": "localip",
-      "key": " ├ 󰩟  Network    ",
+      "key": " ├ 󰩟  Network  ",
       "keyColor": "red",
       "format": "{ipv4} ({ifname})"
     },
     {
       "type": "uptime",
-      "key": " ├   Uptime     ",
+      "key": " ├   Uptime   ",
       "keyColor": "red"
     },
     {
       "type": "command",
-      "key": " └ 󱦟  OS Age     ",
+      "key": " └ 󱦟  OS Age   ",
       "keyColor": "red",
       "text": "birth_install=$(stat -c %W /); current=$(date +%s); time_progression=$((current - birth_install)); days_difference=$((time_progression / 86400)); echo $days_difference days"
     },
@@ -73,47 +68,37 @@
     },
     {
       "type": "de",
-      "key": " ├   DE         ",
+      "key": " ├   DE       ",
       "keyColor": "blue"
     },
     {
       "type": "wm",
-      "key": " ├   WM         ",
+      "key": " ├   WM       ",
       "keyColor": "blue"
     },
     {
       "type": "wmtheme",
-      "key": " ├ 󰉼  Theme      ",
-      "keyColor": "blue"
-    },
-    {
-      "type": "theme",
-      "key": " ├ 󰉼  Theme      ",
+      "key": " ├ 󰉼  Theme    ",
       "keyColor": "blue"
     },
     {
       "type": "icons",
-      "key": " ├ 󰀻  Icons      ",
-      "keyColor": "blue"
-    },
-    {
-      "type": "font",
-      "key": " ├   Font       ",
+      "key": " ├ 󰀻  Icons    ",
       "keyColor": "blue"
     },
     {
       "type": "cursor",
-      "key": " ├   Cursor     ",
+      "key": " ├   Cursor   ",
       "keyColor": "blue"
     },
     {
       "type": "terminal",
-      "key": " ├   Terminal   ",
+      "key": " ├   Terminal ",
       "keyColor": "blue"
     },
     {
       "type": "terminalfont",
-      "key": " └   Term Font  ",
+      "key": " └   Font     ",
       "keyColor": "blue"
     },
     "break",
@@ -123,41 +108,41 @@
     },
     {
       "type": "cpu",
-      "format": "{name} ({cores-logical}) @ {freq-max}",
-      "key": " ├   CPU        ",
+      "format": "{1} ({4}) @ {7}",
+      "key": " ├   CPU      ",
       "keyColor": "magenta"
     },
     {
       "type": "gpu",
-      "key": " ├ 󰢮  GPU        ",
+      "format": "{1} {2} ({3})",
+      "key": " ├ 󰢮  GPU      ",
       "keyColor": "magenta"
     },
     {
       "type": "memory",
-      "key": " ├   Memory     ",
+      "key": " ├   Memory   ",
       "keyColor": "magenta"
     },
     {
       "type": "swap",
-      "key": " ├ 󰓡  Swap       ",
+      "key": " ├ 󰓡  Swap     ",
       "keyColor": "magenta"
     },
     {
       "type": "disk",
-      "format": "{size-used} / {size-total} ({size-percentage}) - {filesystem} ({mountpoint})",
-      "key": " ├ 󰋊  Disk       ",
+      "format": "{1} / {2} ({3}), {9} ({20})",
+      "key": " ├ 󰋊  Disk     ",
       "keyColor": "magenta"
     },
     {
       "type": "display",
-      "format": "{width}x{height} in {inch}\", {refresh-rate} Hz [{type}]",
-      "key": " ├   Display    ",
+      "key": " ├   Display  ",
       "keyColor": "magenta"
     },
     {
       "type": "command",
       "text": "echo \"$(cat /sys/class/dmi/id/board_name) (BIOS Version $(cat /sys/class/dmi/id/bios_version))\"",
-      "key": " └   Board      ",
+      "key": " └   Board    ",
       "keyColor": "magenta"
     }
   ]

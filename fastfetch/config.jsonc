@@ -7,7 +7,7 @@
       "top": 5
     },
     "color": {
-      "1": "cyan"
+      "1": "red"
     }
   },
   "modules": [
@@ -61,96 +61,108 @@
     "break",
     {
       "type": "custom",
-      "format": "\u001b[32mDESKTOP"
+      "format": "\u001b[31mDESKTOP"
     },
     {
       "type": "de",
       "key": " ├   DE         ",
-      "keyColor": "green"
+      "keyColor": "red"
     },
     {
       "type": "wm",
       "key": " ├   WM         ",
-      "keyColor": "green"
+      "keyColor": "red"
     },
     {
       "type": "wmtheme",
       "key": " ├ 󰉼  Theme      ",
-      "keyColor": "green"
+      "keyColor": "red"
     },
     {
       "type": "theme",
       "key": " ├ 󰉼  Theme      ",
-      "keyColor": "green"
+      "keyColor": "red"
     },
     {
       "type": "icons",
       "key": " ├ 󰀻  Icons      ",
-      "keyColor": "green"
+      "keyColor": "red"
     },
     {
       "type": "font",
       "key": " ├   Font       ",
-      "keyColor": "green"
+      "keyColor": "red"
     },
     {
       "type": "cursor",
       "key": " ├   Cursor     ",
-      "keyColor": "green"
+      "keyColor": "red"
     },
     {
       "type": "terminal",
       "key": " ├   Terminal   ",
-      "keyColor": "green"
+      "keyColor": "red"
     },
     {
       "type": "terminalfont",
       "key": " └   Term Font  ",
-      "keyColor": "green"
+      "keyColor": "red"
     },
     "break",
     {
       "type": "custom",
-      "format": "\u001b[34mHARDWARE"
+      "format": "\u001b[31mHARDWARE"
     },
     {
       "type": "cpu",
       "format": "{name} ({cores-logical}) @ {freq-max}",
       "key": " ├   CPU        ",
-      "keyColor": "blue"
+      "keyColor": "red"
     },
     {
       "type": "gpu",
       "key": " ├ 󰢮  GPU        ",
-      "keyColor": "blue"
+      "keyColor": "red"
     },
     {
       "type": "memory",
       "key": " ├   Memory     ",
-      "keyColor": "blue"
+      "keyColor": "red"
     },
     {
       "type": "swap",
       "key": " ├ 󰓡  Swap       ",
-      "keyColor": "blue"
+      "keyColor": "red"
     },
     {
       "type": "disk",
       "format": "{size-used} / {size-total} ({size-percentage}) - {filesystem} ({mountpoint})",
       "key": " ├ 󰋊  Disk       ",
-      "keyColor": "blue"
+      "keyColor": "red"
     },
     {
       "type": "display",
       "format": "{width}x{height} in {inch}\", {refresh-rate} Hz [{type}]",
       "key": " ├   Display    ",
-      "keyColor": "blue"
+      "keyColor": "red"
     },
     {
       "type": "command",
       "text": "echo \"$(cat /sys/class/dmi/id/board_name) (BIOS Version $(cat /sys/class/dmi/id/bios_version))\"",
       "key": " └   Board      ",
-      "keyColor": "blue"
+      "keyColor": "red"
     }
-  ]
+  ],
+  "display": {
+    "color": {
+      "keys": "#eba0ac",
+      "title": "#9399b2"
+    },
+    "percent": {
+      "color": {
+        "red": "#f38ba8",
+        "yellow": "#e996a3"
+      }
+    }
+  }
 }
