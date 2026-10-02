@@ -199,6 +199,40 @@ cp noctalia/lockscreen-bg.png ~/.config/noctalia/lockscreen-bg.png
 `noctalia/settings.toml` is **not shipped** (it's auto-generated per machine);
 the Settings UI writes it to `~/.local/state/noctalia/settings.toml`.
 
+### Theme (palette)
+
+The palette lives in a `[theme]` block in the deployed `config.toml`:
+
+```toml
+[theme]
+source = "community"
+community_palette = "Catppuccin Mocha Maroon"
+builtin = "Tokyo-Night"      # fallback if the community palette can't be fetched
+mode = "dark"
+wallpaper_scheme = "m3-content"
+```
+
+The base colours come from the **named palette**, not the wallpaper — the
+palette is cached under `~/.local/state/noctalia/community-palettes/` on first
+use. `wallpaper_scheme` only affects wallpaper-derived widgets.
+
+**This block is a default, not an override.** Noctalia writes whatever palette
+you pick in its UI into `~/.local/state/noctalia/settings.toml`, and that file
+is merged *on top of* `config.toml`. So a machine that has already chosen a
+theme keeps its own.
+
+**To match this theme on another machine that is already set up**, use the CLI
+rather than editing `config.toml`:
+
+```bash
+noctalia msg color-scheme-set community "Catppuccin Mocha Maroon"
+noctalia msg templates-apply          # regenerate kitty/fastfetch/hyprtoolkit etc.
+noctalia msg color-scheme-get         # verify: community Catppuccin Mocha Maroon
+```
+
+There is no CLI verb for the wallpaper — set that in the Noctalia UI. The
+palette is fetched automatically, so only the image needs transferring.
+
 ### Fonts
 
 The `The Last Shuriken` lock screen clock font is **not shipped** — its

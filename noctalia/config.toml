@@ -1,6 +1,45 @@
 # Noctalia idle behavior: fade/darken after 5 min, lock after 10 min, suspend after 15 min.
 # Noctalia owns the lock screen; hypridle only handles lock-on-manual-suspend glue.
 
+# Default palette, applied on machines that have no [theme] of their own.
+# IMPORTANT: Noctalia writes the palette you pick in its UI into
+# ~/.local/state/noctalia/settings.toml, and that file is merged ON TOP of this
+# one (see config_service.cpp, mergeUserConfigSources). So this block is only a
+# default: any machine that has already chosen a theme keeps its own.
+# To change an existing machine, use the CLI instead of editing this file:
+#   noctalia msg color-scheme-set community "Catppuccin Mocha Maroon"
+#   noctalia msg templates-apply
+[theme]
+source = "community"
+community_palette = "Catppuccin Mocha Maroon"
+# Fallback if the community palette cannot be fetched (it is cached locally on
+# first use, so this only matters offline on a brand-new machine).
+builtin = "Tokyo-Night"
+mode = "dark"
+# Derives accent tones from the wallpaper. The palette above is what actually
+# sets the base colors; this only affects wallpaper-derived widgets.
+wallpaper_scheme = "m3-content"
+
+[theme.templates]
+builtin_ids = [ "btop", "cava", "gtk3", "gtk4", "hyprland", "kcolorscheme", "kitty", "qt" ]
+community_ids = [
+    "opencode",
+    "spicetify",
+    "discord",
+    "telegram",
+    "micro",
+    "neovim",
+    "vscode",
+    "heroiclauncher",
+    "prismlauncher",
+    "steam",
+    "fuzzel",
+    "fastfetch",
+    "hyprtoolkit",
+    "tmux",
+    "yazi",
+]
+
 [idle]
 
 [idle.behavior.dim]
