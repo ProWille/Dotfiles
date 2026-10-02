@@ -309,6 +309,7 @@ CONFIRM_TARGETS=(
   "$HOME/.config/hypr"
   "$HOME/.config/kitty"
   "$HOME/.config/fastfetch"
+  "$HOME/.config/qt6ct/qt6ct.conf"
   "$HOME/.config/noctalia/config.toml"
   "$HOME/.config/noctalia/lockscreen-bg.png"
   "$HOME/.zshrc"
@@ -337,19 +338,24 @@ if [ "$DRY_RUN" = false ] && [ "$DO_ASK" = true ] && [ "${#EXISTING[@]}" -gt 0 ]
 fi
 
 deploy_dir  "$REPO_DIR/hypr"                  "$HOME/.config/hypr"
+# Deployed before the @@HOME@@ substitution below, not alongside the other
+# deploy_file calls at the end of this function.
+deploy_file "$REPO_DIR/qt6ct.conf"             "$HOME/.config/qt6ct/qt6ct.conf"
 
 # hyprqt6engine's theme:color_scheme needs an absolute path and loadColorScheme()
 # does no ~ expansion, so the repo copy carries a @@HOME@@ placeholder that must be
-# substituted after deploy_dir copies the tree verbatim.
-HYPRQT_CONF="$HOME/.config/hypr/hyprqt6engine.conf"
-if [ -f "$HYPRQT_CONF" ]; then
-  if [ "$DRY_RUN" = true ]; then
-    echo "    [dry-run] substitute @@HOME@@ in $HYPRQT_CONF"
-  elif grep -q '@@HOME@@' "$HYPRQT_CONF"; then
-    sed -i "s|@@HOME@@|$HOME|g" "$HYPRQT_CONF"
-    echo "    rendered @@HOME@@ in hyprqt6engine.conf"
+# substituted after deploy_dir copies the tree verbatim. qt6ct.conf has the same
+# constraint for the same reason (Qt expands neither ~ nor $HOME in these paths).
+for RENDER_ME in "$HOME/.config/hypr/hyprqt6engine.conf" "$HOME/.config/qt6ct/qt6ct.conf"; do
+  if [ -f "$RENDER_ME" ]; then
+    if [ "$DRY_RUN" = true ]; then
+      echo "    [dry-run] substitute @@HOME@@ in $RENDER_ME"
+    elif grep -q '@@HOME@@' "$RENDER_ME"; then
+      sed -i "s|@@HOME@@|$HOME|g" "$RENDER_ME"
+      echo "    rendered @@HOME@@ in $(basename "$RENDER_ME")"
+    fi
   fi
-fi
+done
 
 ENV_FILE="$HOME/.config/hypr/modules/env.lua"
 if [ "$DO_NVIDIA" = true ] && [ -f "$ENV_FILE" ]; then
