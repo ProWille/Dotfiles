@@ -7,164 +7,174 @@
       "top": 5
     },
     "color": {
-      "1": "#eb63ac",
-      "2": "#6399b2"
+      "1": "#94e2d5"
     }
   },
   "modules": [
     {
       "type": "custom",
-      "format": "\u001b[31mSYSTEM"
+      "format": "\u001b[38;2;243;139;168mSYSTEM"
     },
     {
       "type": "os",
       "key": " ├   OS         ",
-      "keyColor": "red"
+      "keyColor": "#f38ba8",
+      "outputColor": "#00d0b8"
     },
     {
       "type": "kernel",
       "key": " ├   Kernel     ",
-      "keyColor": "red"
+      "keyColor": "#f38ba8",
+      "outputColor": "#00d0b8"
     },
     {
       "type": "gpu",
       "format": "{driver}",
       "key": " ├ 󰢮  GPU Driver ",
-      "keyColor": "red"
+      "keyColor": "#f38ba8",
+      "outputColor": "#00d0b8"
     },
     {
       "type": "packages",
       "key": " ├ 󰏖  Packages   ",
-      "keyColor": "red"
+      "keyColor": "#f38ba8",
+      "outputColor": "#00d0b8"
     },
     {
       "type": "shell",
       "key": " ├   Shell      ",
-      "keyColor": "red"
+      "keyColor": "#f38ba8",
+      "outputColor": "#00d0b8"
     },
     {
       "type": "localip",
       "key": " ├ 󰩟  Network    ",
-      "keyColor": "red",
+      "keyColor": "#f38ba8",
+      "outputColor": "#00d0b8",
       "format": "{ipv4} ({ifname})"
     },
     {
       "type": "uptime",
       "key": " ├   Uptime     ",
-      "keyColor": "red"
+      "keyColor": "#f38ba8",
+      "outputColor": "#00d0b8"
     },
     {
       "type": "command",
       "key": " └ 󱦟  OS Age     ",
-      "keyColor": "red",
+      "keyColor": "#f38ba8",
+      "outputColor": "#00d0b8",
       "text": "birth_install=$(stat -c %W /); current=$(date +%s); time_progression=$((current - birth_install)); days_difference=$((time_progression / 86400)); echo $days_difference days"
     },
     "break",
     {
       "type": "custom",
-      "format": "\u001b[31mDESKTOP"
+      "format": "\u001b[38;2;137;180;244mDESKTOP"
     },
     {
       "type": "de",
       "key": " ├   DE         ",
-      "keyColor": "red"
+      "keyColor": "#89b4f4",
+      "outputColor": "#00d0b8"
     },
     {
       "type": "wm",
       "key": " ├   WM         ",
-      "keyColor": "red"
+      "keyColor": "#89b4f4",
+      "outputColor": "#00d0b8"
     },
     {
       "type": "wmtheme",
       "key": " ├ 󰉼  Theme      ",
-      "keyColor": "red"
+      "keyColor": "#89b4f4",
+      "outputColor": "#00d0b8"
     },
     {
       "type": "theme",
       "key": " ├ 󰉼  Theme      ",
-      "keyColor": "red"
+      "keyColor": "#89b4f4",
+      "outputColor": "#00d0b8"
     },
     {
       "type": "icons",
       "key": " ├ 󰀻  Icons      ",
-      "keyColor": "red"
+      "keyColor": "#89b4f4",
+      "outputColor": "#00d0b8"
     },
     {
       "type": "font",
       "key": " ├   Font       ",
-      "keyColor": "red"
+      "keyColor": "#89b4f4",
+      "outputColor": "#00d0b8"
     },
     {
       "type": "cursor",
       "key": " ├   Cursor     ",
-      "keyColor": "red"
+      "keyColor": "#89b4f4",
+      "outputColor": "#00d0b8"
     },
     {
       "type": "terminal",
       "key": " ├   Terminal   ",
-      "keyColor": "red"
+      "keyColor": "#89b4f4",
+      "outputColor": "#00d0b8"
     },
     {
       "type": "terminalfont",
       "key": " └   Term Font  ",
-      "keyColor": "red"
+      "keyColor": "#89b4f4",
+      "outputColor": "#00d0b8"
     },
     "break",
     {
       "type": "custom",
-      "format": "\u001b[31mHARDWARE"
+      "format": "\u001b[38;2;191;148;228mHARDWARE"
     },
     {
       "type": "cpu",
       "format": "{name} ({cores-logical}) @ {freq-max}",
       "key": " ├   CPU        ",
-      "keyColor": "red"
+      "keyColor": "#bf94e4",
+      "outputColor": "#00d0b8"
     },
     {
       "type": "gpu",
       "key": " ├ 󰢮  GPU        ",
-      "keyColor": "red"
+      "keyColor": "#bf94e4",
+      "outputColor": "#00d0b8"
     },
     {
       "type": "memory",
       "key": " ├   Memory     ",
-      "keyColor": "red"
+      "keyColor": "#bf94e4",
+      "outputColor": "#00d0b8"
     },
     {
       "type": "swap",
       "key": " ├ 󰓡  Swap       ",
-      "keyColor": "red"
+      "keyColor": "#bf94e4",
+      "outputColor": "#00d0b8"
     },
     {
       "type": "disk",
       "format": "{size-used} / {size-total} ({size-percentage}) - {filesystem} ({mountpoint})",
       "key": " ├ 󰋊  Disk       ",
-      "keyColor": "red"
+      "keyColor": "#bf94e4",
+      "outputColor": "#00d0b8"
     },
     {
       "type": "display",
       "format": "{width}x{height} in {inch}\", {refresh-rate} Hz [{type}]",
       "key": " ├   Display    ",
-      "keyColor": "red"
+      "keyColor": "#bf94e4",
+      "outputColor": "#00d0b8"
     },
     {
       "type": "command",
       "text": "echo \"$(cat /sys/class/dmi/id/board_name) (BIOS Version $(cat /sys/class/dmi/id/bios_version))\"",
       "key": " └   Board      ",
-      "keyColor": "red"
+      "keyColor": "#bf94e4",
+      "outputColor": "#00d0b8"
     }
-  ],
-  "display": {
-    "color": {
-      "keys": "#eba0ac",
-      "title": "#9399b2"
-    },
-    "percent": {
-      "color": {
-        "red": "#f38ba8",
-        "yellow": "#e996a3",
-        "green": "#b4befe"
-      }
-    }
-  }
+  ]
 }

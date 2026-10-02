@@ -158,6 +158,40 @@ may overwrite it with a slightly different palette. `hyprtoolkit.conf` is also
 Noctalia-generated but is not required at boot, so nothing requires it to
 exist; it is shipped anyway so the live color template is reproduced.
 
+#### Qt theming
+
+`modules/env.lua` sets `QT_QPA_PLATFORMTHEME=hyprqt6engine`. It cannot be
+`kde`, because that platform theme ships as `KDEPlasmaPlatformTheme6.so` from
+`plasma-integration`, which this setup does not install.
+
+`hypr/hyprqt6engine.conf` is the theme's own config and is **not** read by
+Hyprland — it is read by hyprqt6engine itself, from
+`~/.config/hypr/hyprqt6engine.conf`. Two things about it are easy to get wrong,
+both recorded as comments in the file:
+
+- The format is Hyprlang (`category:key = value`), not ini.
+- `theme:color_scheme` must be an absolute path, so the repo copy carries an
+  `@@HOME@@` placeholder that `install.sh` substitutes after deploying the
+  `hypr/` tree. `cp -a hypr ~/.config/hypr` on its own leaves the placeholder
+  unsubstituted.
+
+It points at `~/.config/qt6ct/colors/noctalia.conf`, which is Noctalia's own
+`qt` builtin template output. That path is fixed rather than per-palette, so
+the file is rewritten in place on every theme change and the config follows
+along automatically.
+
+**Do not install `kvantum`.** It registers a Qt style that paints with its own
+palette and discards the one hyprqt6engine loads, which renders every Qt app
+flat grey even though the config is correct. If Qt apps look wrong, check
+`pacman -Q kvantum` first:
+
+```sh
+sudo pacman -Rs kvantum   # orphaned once Plasma is gone; nothing requires it
+```
+
+A stray `[theme]` section header, a `~`-prefixed path, or Kvantum installed all
+produce the same symptom: a correct-looking config and light-grey apps.
+
 ### Noctalia config
 
 `noctalia/config.toml` is a **template**: monitor names and lock-screen widget
@@ -226,18 +260,21 @@ rather than editing `config.toml`:
 
 ```bash
 noctalia msg color-scheme-set community "Catppuccin Mocha Maroon"
-noctalia msg templates-apply          # regenerate kitty/fastfetch/hyprtoolkit etc.
+noctalia msg templates-apply          # regenerate kitty/hyprtoolkit/btop/cava etc.
 noctalia msg color-scheme-get         # verify: community Catppuccin Mocha Maroon
 ```
 
-`templates-apply` is **not** side-effect-free. Beyond rewriting the four
-generated theme files, the fastfetch template's `apply.sh` hook also deep-merges
-the theme's `logo` and `display` blocks into `~/.config/fastfetch/config.jsonc`,
-overwriting any colours set there by hand. It converges after one run — a second
-call changes nothing — but run it on a machine whose fastfetch logo colours you
-care about and those colours will be replaced by the theme's. The template is
-cached under `~/.local/state/noctalia/community-templates/` if you want to read
-the hook before running it.
+`templates-apply` rewrites the generated theme files listed below. It is **not**
+side-effect-free, but it does not touch `fastfetch/config.jsonc`: the fastfetch
+community template is *not* in `theme.templates.community_ids`, and
+`template_apply_service.cpp` only iterates the ids in that list, so its
+`apply.sh` hook never runs. `fastfetch/config.jsonc` is therefore entirely
+hand-owned. The template is still cached under
+`~/.local/state/noctalia/community-templates/fastfetch/` — if you ever add
+`fastfetch` to `community_ids`, its hook will start deep-merging the theme's
+`logo` and `display` blocks into the config (`jq -s '.[0] * .[1]'`) and
+overwrite the logo colour. Remove the id again before running
+`templates-apply` if you want to keep the colours below.
 
 There is no CLI verb for the wallpaper — set that in the Noctalia UI. The
 palette is fetched automatically, so only the image needs transferring.
@@ -349,22 +386,44 @@ look; re-copy from the live path to resync.
 |------|---------------|
 | `hypr/noctalia.lua` | `~/.config/hypr/noctalia.lua` |
 | `hypr/hyprtoolkit.conf` | `~/.config/hypr/hyprtoolkit.conf` |
+| `hypr/hyprqt6engine.conf` (`@@HOME@@` substituted) | `~/.config/hypr/hyprqt6engine.conf` |
 | `kitty/themes/noctalia.conf` | `~/.config/kitty/themes/noctalia.conf` |
-| `fastfetch/themes/noctalia.jsonc` | `~/.config/fastfetch/themes/noctalia.jsonc` |
-| `fastfetch/config.jsonc` (partial) | `~/.config/fastfetch/config.jsonc` |
+| `fastfetch/themes/noctalia.jsonc` (inert) | `~/.config/fastfetch/themes/noctalia.jsonc` |
+| `fastfetch/config.jsonc` | `~/.config/fastfetch/config.jsonc` |
 
 `hypr/noctalia.lua` is also a bootstrap: Hyprland boots on a fresh machine
 because the file ships with the repo rather than being generated on first run.
 
-`fastfetch/config.jsonc` is only *partly* generated: the fastfetch template's
-`apply.sh` hook deep-merges the theme's `logo` and `display` blocks into it
-(`jq -s '.[0] * .[1]'`), so those two blocks get overwritten whenever the theme
-is applied. Everything else in the file — modules, logo `source`/`height`/`padding`
-— is hand-maintained and only touched by you. The hook nudges `logo.color`
-channels down to 99 when all three are ≥100, working around a fastfetch bug
-where a 16-character truecolor SGR string is dropped silently (this was
-verified against 2.66.0; on 2.69.0 it appears to be fixed, but the hook still
-runs).
+`hypr/hyprqt6engine.conf` is hand-maintained and carries an `@@HOME@@`
+placeholder that `install.sh` substitutes — see [Qt theming](#qt-theming).
+
+`fastfetch/config.jsonc` is fully hand-maintained — see the `templates-apply`
+note above for why the template never touches it. Keys are coloured per section,
+values are a single teal, and the logo is a second teal:
+
+| Element | Colour | Catppuccin Mocha role |
+|---------|--------|-----------------------|
+| SYSTEM keys | `#f38ba8` | red |
+| DESKTOP keys | `#89b4f4` | blue |
+| HARDWARE keys | `#bf94e4` | mauve |
+| all module values (`outputColor`) | `#00d0b8` | — (not a palette colour) |
+| logo (`logo.color.1`) | `#94e2d5` | — (not a palette colour) |
+
+The section headers are `custom` modules using truecolor escapes rather than
+the generic `31m`/`34m`/`35m` codes, which rendered as flat ANSI and did not
+match the pastel keys.
+
+A second `logo.color.2` would have no effect: it only applies to ASCII art
+containing `%c1`/`%c2` markers, and `ascii_wolf.txt` has none, so fastfetch
+paints every line with `color.1`. A second tone would require embedding raw SGR
+escapes in the art file, and those carry forward — once a line switches, every
+line after it stays switched, making it a split point rather than a highlight.
+
+Note for anyone re-enabling the fastfetch template: its hook nudges
+`logo.color` channels down to 99 when all three are ≥100, working around a
+fastfetch bug where a 16-character truecolor SGR string is dropped silently
+(verified against 2.66.0; on 2.69.0 it appears to be fixed). The teal sidesteps
+that path anyway, since its red channel is 0.
 
 ## Tests
 

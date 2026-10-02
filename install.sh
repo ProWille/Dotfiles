@@ -122,8 +122,14 @@ fi
 
 if [ "$DO_DEPS" = true ]; then
   echo "==> Dependencies"
+  # ddcutil: read/written directly by tests/brightness-target.sh, and it is the
+  #   only DDC backend on this machine (powerdevil was the only thing pulling it
+  #   in, so it has no provider left without Plasma).
+  # hyprqt6engine-git: backs QT_QPA_PLATFORMTHEME in hypr/modules/env.lua.
+  #   Silently does nothing if absent, so it must be a hard requirement.
   REQUIRED=(hyprland noctalia kitty hyprlauncher dolphin firefox easyeffects
-            xorg-xrandr playerctl hyprpolkitagent zsh eza fastfetch git)
+            xorg-xrandr playerctl hyprpolkitagent zsh eza fastfetch git
+            ddcutil hyprqt6engine-git network-manager-applet)
   if [ "$DO_NVIDIA" = true ]; then
     REQUIRED+=(nvidia-utils)
   fi
@@ -331,6 +337,19 @@ if [ "$DRY_RUN" = false ] && [ "$DO_ASK" = true ] && [ "${#EXISTING[@]}" -gt 0 ]
 fi
 
 deploy_dir  "$REPO_DIR/hypr"                  "$HOME/.config/hypr"
+
+# hyprqt6engine's theme:color_scheme needs an absolute path and loadColorScheme()
+# does no ~ expansion, so the repo copy carries a @@HOME@@ placeholder that must be
+# substituted after deploy_dir copies the tree verbatim.
+HYPRQT_CONF="$HOME/.config/hypr/hyprqt6engine.conf"
+if [ -f "$HYPRQT_CONF" ]; then
+  if [ "$DRY_RUN" = true ]; then
+    echo "    [dry-run] substitute @@HOME@@ in $HYPRQT_CONF"
+  elif grep -q '@@HOME@@' "$HYPRQT_CONF"; then
+    sed -i "s|@@HOME@@|$HOME|g" "$HYPRQT_CONF"
+    echo "    rendered @@HOME@@ in hyprqt6engine.conf"
+  fi
+fi
 
 ENV_FILE="$HOME/.config/hypr/modules/env.lua"
 if [ "$DO_NVIDIA" = true ] && [ -f "$ENV_FILE" ]; then

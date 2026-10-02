@@ -21,7 +21,13 @@ hl.env("XDG_SESSION_DESKTOP", "Hyprland")
 -- Qt Variables
 hl.env("QT_AUTO_SCREEN_SCALE_FACTOR", "1")
 hl.env("QT_WAYLAND_DISABLE_WINDOWDECORATION", "1")
-hl.env("QT_QPA_PLATFORMTHEME", "kde")
+-- hyprqt6engine, not "kde": the KDE platform theme ships as
+-- KDEPlasmaPlatformTheme6.so from plasma-integration, which this setup does
+-- not install. hyprqt6engine is the Hyprland-native equivalent (a qt6ct
+-- replacement) and still understands KColorScheme, so the colour scheme
+-- Noctalia's kcolorscheme template writes keeps applying to Qt apps.
+-- See https://wiki.hypr.land/Hypr-Ecosystem/hyprqt6engine/
+hl.env("QT_QPA_PLATFORMTHEME", "hyprqt6engine")
 
 -- NVIDIA Specific
 --hl.env("__GLX_VENDOR_LIBRARY_NAME", "nvidia")
