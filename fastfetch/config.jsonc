@@ -7,7 +7,8 @@
       "top": 5
     },
     "color": {
-      "1": "red"
+      "1": "#eb63ac",
+      "2": "#6399b2"
     }
   },
   "modules": [
@@ -161,7 +162,8 @@
     "percent": {
       "color": {
         "red": "#f38ba8",
-        "yellow": "#e996a3"
+        "yellow": "#e996a3",
+        "green": "#b4befe"
       }
     }
   }

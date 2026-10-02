@@ -230,6 +230,15 @@ noctalia msg templates-apply          # regenerate kitty/fastfetch/hyprtoolkit e
 noctalia msg color-scheme-get         # verify: community Catppuccin Mocha Maroon
 ```
 
+`templates-apply` is **not** side-effect-free. Beyond rewriting the four
+generated theme files, the fastfetch template's `apply.sh` hook also deep-merges
+the theme's `logo` and `display` blocks into `~/.config/fastfetch/config.jsonc`,
+overwriting any colours set there by hand. It converges after one run — a second
+call changes nothing — but run it on a machine whose fastfetch logo colours you
+care about and those colours will be replaced by the theme's. The template is
+cached under `~/.local/state/noctalia/community-templates/` if you want to read
+the hook before running it.
+
 There is no CLI verb for the wallpaper — set that in the Noctalia UI. The
 palette is fetched automatically, so only the image needs transferring.
 
@@ -342,9 +351,20 @@ look; re-copy from the live path to resync.
 | `hypr/hyprtoolkit.conf` | `~/.config/hypr/hyprtoolkit.conf` |
 | `kitty/themes/noctalia.conf` | `~/.config/kitty/themes/noctalia.conf` |
 | `fastfetch/themes/noctalia.jsonc` | `~/.config/fastfetch/themes/noctalia.jsonc` |
+| `fastfetch/config.jsonc` (partial) | `~/.config/fastfetch/config.jsonc` |
 
 `hypr/noctalia.lua` is also a bootstrap: Hyprland boots on a fresh machine
 because the file ships with the repo rather than being generated on first run.
+
+`fastfetch/config.jsonc` is only *partly* generated: the fastfetch template's
+`apply.sh` hook deep-merges the theme's `logo` and `display` blocks into it
+(`jq -s '.[0] * .[1]'`), so those two blocks get overwritten whenever the theme
+is applied. Everything else in the file — modules, logo `source`/`height`/`padding`
+— is hand-maintained and only touched by you. The hook nudges `logo.color`
+channels down to 99 when all three are ≥100, working around a fastfetch bug
+where a 16-character truecolor SGR string is dropped silently (this was
+verified against 2.66.0; on 2.69.0 it appears to be fixed, but the hook still
+runs).
 
 ## Tests
 
