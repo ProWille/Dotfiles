@@ -434,10 +434,12 @@ the real `ddcutil` and `noctalia` binaries. Run it from anywhere:
 ./tests/brightness-target.sh
 ```
 
-It is **machine-specific**: it asserts against this machine's monitor layout
-(`DP-3` as the DDC fallback, `HDMI-A-1` as the permanently DDC-less output). On
-other hardware the brightness assertions report `SKIP` rather than a misleading
-pass or fail, though the argument-validation tests still run.
+The DDC fallback target is per host: `scripts/brightness-target.sh` reads the
+machine marker `~/.config/machine` (written by `install.sh`; `laptop` →
+`eDP-1`, `pc` → `DP-3`), and the test derives the same value. `HDMI-A-1` is the
+permanently DDC-less output on both hosts. On hardware where the fallback panel
+is unreachable over DDC the brightness assertions report `SKIP` rather than a
+misleading pass or fail, though the argument-validation tests still run.
 
 `ddcutil` is an unreliable oracle on this panel — a write sometimes fails to
 land inside the read window — so a "did not dim" assertion is retried a few

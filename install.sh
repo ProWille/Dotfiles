@@ -127,9 +127,11 @@ if [ "$DO_DEPS" = true ]; then
   #   in, so it has no provider left without Plasma).
   # hyprqt6engine-git: backs QT_QPA_PLATFORMTHEME in hypr/modules/env.lua.
   #   Silently does nothing if absent, so it must be a hard requirement.
+  # jq: parses `hyprctl monitors -j` in scripts/brightness-target.sh; missing
+  #   it silently degrades the wrapper to always-fallback.
   REQUIRED=(hyprland noctalia kitty hyprlauncher dolphin firefox easyeffects
             xorg-xrandr playerctl hyprpolkitagent zsh eza fastfetch git
-            ddcutil hyprqt6engine-git network-manager-applet)
+            ddcutil jq hyprqt6engine-git network-manager-applet)
   if [ "$DO_NVIDIA" = true ]; then
     REQUIRED+=(nvidia-utils)
   fi

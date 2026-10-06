@@ -12,8 +12,13 @@
 # Noctalia's own settings instead.
 set -uo pipefail
 
-# Main monitor. Rename this if the connector is ever renumbered.
-FALLBACK="DP-3"
+# Main monitor, per host. install.sh writes this machine's type (laptop|pc) to
+# ~/.config/machine; the laptop's built-in panel is eDP-1, the desktop's is
+# DP-3. A missing marker (e.g. bare checkout) keeps the old DP-3 default.
+case "$(cat "$HOME/.config/machine" 2>/dev/null)" in
+  laptop) FALLBACK="eDP-1" ;;
+  *)      FALLBACK="DP-3" ;;
+esac
 
 ACTION="${1:?usage: brightness-target.sh <up|down>}"
 

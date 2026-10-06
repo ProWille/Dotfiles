@@ -1,29 +1,42 @@
 #!/usr/bin/env bash
 # Test for scripts/brightness-target.sh
 #
-# Real wrapper, real ddcutil, real noctalia. Noctalia's Lua bridge breaks every
-# `hyprctl dispatch` on this machine (it rejects unquoted args), so focus cannot
-# be moved from a script. The only shim is therefore `hyprctl monitors -j`,
-# made to report a chosen output as focused -- the wrapper's one input we cannot
-# otherwise control. Everything downstream of that is the real code path.
-#
-# ddcutil display indexes renumber whenever a panel drops off the I2C bus, so
-# connector -> index is resolved fresh each run. Only Hyprland connector NAMES
-# are stable, which is what the wrapper keys on.
+# Real wrapper, real ddcutil/brightnessctl, real noctalia. Noctalia's Lua bridge
+# breaks every `hyprctl dispatch` on this machine (it rejects unquoted args), so
+# focus cannot be moved from a script. The only shim is therefore
+# `hyprctl monitors -j`, made to report a chosen output as focused -- the
+# wrapper's one input we cannot otherwise control. Everything downstream of that
+# is the real code path.
 #
 # Asserts the wrapper's actual contract -- right target, exit 0, no error leak.
 # It deliberately does NOT assert the size of the step: how a given step value
-# maps to VCP 10 is Noctalia's business, not the wrapper's.
+# maps to VCP 10 or a backlight percentage is Noctalia's business, not the
+# wrapper's.
 #
-# MACHINE-SPECIFIC. FALLBACK_NAME and DDC_DEAD below name this machine's
-# monitor layout. On other hardware the brightness assertions report SKIP
-# rather than a misleading PASS or FAIL; the usage/argument tests still run.
+# The fallback target is per host, read from ~/.config/machine (written by
+# install.sh; laptop -> eDP-1, pc -> DP-3) -- the same marker the deployed
+# wrapper resolves at runtime. The brightness oracle is hardware-dependent:
+#
+#   pc     DP-3   ddcutil on VCP 10. Display indexes renumber whenever a panel
+#                 drops off the I2C bus, so connector -> index is resolved fresh
+#                 each run. Only Hyprland connector NAMES are stable.
+#   laptop eDP-1  built-in panels expose no DDC/CI (ddcutil: "Laptop displays do
+#                 not support DDC/CI"), so the oracle is the sysfs backlight via
+#                 brightnessctl (udev/polkit; a bare sysfs write needs root).
+#
+# DDC_DEAD names this machine's permanently DDC-less output (the TV). On
+# hardware where neither oracle can reach the fallback panel the brightness
+# assertions report SKIP rather than a misleading PASS or FAIL; the
+# usage/argument tests still run.
 #
 # usage: tests/brightness-target.sh [path-to-wrapper]
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SCRIPT="${1:-$REPO_ROOT/scripts/brightness-target.sh}"
-FALLBACK_NAME="DP-3"
+case "$(cat "$HOME/.config/machine" 2>/dev/null)" in
+  laptop) FALLBACK_NAME="eDP-1" ;;
+  *)      FALLBACK_NAME="DP-3" ;;
+esac
 DDC_DEAD="HDMI-A-1"        # TV, permanently without DDC/CI
 
 pass=0; fail=0; skip=0
@@ -65,14 +78,46 @@ exec /usr/bin/hyprctl "$@"
 SHIMEOF
 chmod +x "$SHIM/hyprctl"
 
-IDX_DP2="$(ddc_index DP-2 || true)"
-IDX_DP3="$(ddc_index DP-3 || true)"
-V_DP3="$( [ -n "$IDX_DP3" ] && read_vcp "$IDX_DP3" )"
+# --- oracle: how the fallback panel's brightness is read/written --------------
+#   ddc   desktop monitor over DDC/CI (ddcutil, VCP 10)
+#   sysfs laptop eDP panel over its sysfs backlight (brightnessctl)
+IDX_DP2="$(ddc_index DP-2 || true)"   # pc-only output; unreachable on the laptop
+IDX_FB="$(ddc_index "$FALLBACK_NAME" || true)"
+ORACLE="none"
+BACKLIGHT_DEV=""
+case "$FALLBACK_NAME" in
+  eDP-1)  # laptop panel: no DDC/CI, backlight under /sys/class/backlight
+    BACKLIGHT_DEV="$(ls /sys/class/backlight 2>/dev/null | head -1)"
+    [ -n "$BACKLIGHT_DEV" ] && ORACLE="sysfs"
+    ;;
+  *)      # desktop monitor: DDC/CI over the display's I2C bus
+    [ -n "$IDX_FB" ] && ORACLE="ddc"
+    ;;
+esac
 
+brightness_read() {
+  case "$ORACLE" in
+    ddc)   read_vcp "$IDX_FB" ;;
+    sysfs) cat "/sys/class/backlight/$BACKLIGHT_DEV/brightness" 2>/dev/null ;;
+    *)     return 1 ;;
+  esac
+}
+brightness_set() { # <vcp-value | absolute backlight value>
+  case "$ORACLE" in
+    ddc)   ddcutil --display "$IDX_FB" setvcp 10 "$1" >/dev/null 2>&1 ;;
+    sysfs) brightnessctl --quiet --device="$BACKLIGHT_DEV" set "$1" >/dev/null 2>&1 ;;
+    *)     return 1 ;;
+  esac
+}
+
+ORIG_FB="$(brightness_read)"
 restore() {
-  [ -n "$V_DP3" ] && [ -n "$IDX_DP3" ] && ddcutil --display "$IDX_DP3" setvcp 10 "$V_DP3" >/dev/null 2>&1
+  case "$ORACLE" in
+    ddc)   [ -n "$ORIG_FB" ] && ddcutil --display "$IDX_FB" setvcp 10 "$ORIG_FB" >/dev/null 2>&1 ;;
+    sysfs) [ -n "$ORIG_FB" ] && brightnessctl --quiet --device="$BACKLIGHT_DEV" set "$ORIG_FB" >/dev/null 2>&1 ;;
+  esac
   rm -rf "$SHIM"
-  printf '  (restored DP-3 to %s)\n' "${V_DP3:-n/a}"
+  printf '  (restored %s to %s)\n' "$FALLBACK_NAME" "${ORIG_FB:-n/a}"
 }
 trap restore EXIT
 
@@ -80,17 +125,21 @@ trap restore EXIT
 # so a test that runs after another can otherwise start at 0 and "dim" to a
 # no-op -- which would make a strict decrease assertion untestable.
 prime() {
-  [ -n "$IDX_DP3" ] || return 0
-  ddcutil --display "$IDX_DP3" setvcp 10 60 >/dev/null 2>&1
+  case "$ORACLE" in
+    ddc)   brightness_set 60 ;;
+    sysfs) brightness_set 60% ;;
+    *)     return 0 ;;
+  esac
   sleep 0.4
-  read_vcp "$IDX_DP3"
+  brightness_read
 }
 
-# ddcutil is an unreliable oracle on this panel: a write sometimes fails to land
-# inside the read window (observed flapping between 0 and 2 failures across runs
-# with the wrapper unchanged). Retry a few times before declaring a routing bug,
-# so a transient I2C dropout is not mistaken for a real failure. A pass still
-# requires an OBSERVED decrease plus a clean exit.
+# The brightness oracle is not perfectly reliable on either backend: ddcutil
+# writes sometimes fail to land inside the read window (observed flapping
+# between 0 and 2 failures across runs with the wrapper unchanged), and a sysfs
+# backlight can be clamped by hardware. Retry a few times before declaring a
+# routing bug, so a transient drop is not mistaken for a real failure. A pass
+# still requires an OBSERVED decrease plus a clean exit.
 dimmed() { # dimmed <label> <FORCE_FOCUSED or empty>
   local label="$1" force="${2:-}" tries=0 b="" a="" out="" rc=""
   while [ "$tries" -lt 4 ]; do
@@ -101,7 +150,7 @@ dimmed() { # dimmed <label> <FORCE_FOCUSED or empty>
     else
       out="$("$SCRIPT" down 2>&1)"; rc=$?
     fi
-    sleep 0.6; a="$(read_vcp "$IDX_DP3")"
+    sleep 0.6; a="$(brightness_read)"
     if [ "$rc" -eq 0 ] && [ -n "$a" ] && [ -n "$b" ] && [ "$a" -lt "$b" ]; then
       ok "$label dimmed: $b -> $a (attempt $tries)"
       case "$out" in
@@ -116,7 +165,7 @@ dimmed() { # dimmed <label> <FORCE_FOCUSED or empty>
   return 1
 }
 
-echo "  [topology] $FALLBACK_NAME ddc-idx=${IDX_DP3:-UNREACHABLE} vcp=${V_DP3:-n/a} | DP-2 ddc-idx=${IDX_DP2:-unreachable}"
+echo "  [topology] $FALLBACK_NAME oracle=$ORACLE ddc-idx=${IDX_FB:-unreachable} backlight=${BACKLIGHT_DEV:-none} | DP-2 ddc-idx=${IDX_DP2:-unreachable}"
 echo
 
 echo "== 1. wrapper exists and is executable"
@@ -125,7 +174,7 @@ if [ -x "$SCRIPT" ]; then ok "executable: $SCRIPT"; else bad "missing or not exe
 echo
 echo "== 2. routes to the focused output when it HAS brightness"
 if [ ! -x "$SCRIPT" ]; then bad "skipped - no executable wrapper"
-elif [ -z "$IDX_DP3" ]; then bad "skipped - $FALLBACK_NAME unreachable over DDC, cannot assert"
+elif [ "$ORACLE" = "none" ]; then bad "skipped - no reachable brightness oracle for $FALLBACK_NAME"
 else
   dimmed "focused $FALLBACK_NAME" "$FALLBACK_NAME"
 fi
@@ -133,7 +182,7 @@ fi
 echo
 echo "== 3. FALLS BACK to $FALLBACK_NAME when focus is on a DDC-less output ($DDC_DEAD)"
 if [ ! -x "$SCRIPT" ]; then bad "skipped - no executable wrapper"
-elif [ -z "$IDX_DP3" ]; then bad "skipped - $FALLBACK_NAME unreachable over DDC, cannot assert"
+elif [ "$ORACLE" = "none" ]; then bad "skipped - no reachable brightness oracle for $FALLBACK_NAME"
 else
   dimmed "fallback $FALLBACK_NAME (focus forced to $DDC_DEAD)" "$DDC_DEAD"
 fi
