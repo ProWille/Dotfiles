@@ -125,13 +125,18 @@ if [ "$DO_DEPS" = true ]; then
   # ddcutil: read/written directly by tests/brightness-target.sh, and it is the
   #   only DDC backend on this machine (powerdevil was the only thing pulling it
   #   in, so it has no provider left without Plasma).
-  # hyprqt6engine-git: backs QT_QPA_PLATFORMTHEME in hypr/modules/env.lua.
-  #   Silently does nothing if absent, so it must be a hard requirement.
+  # qt6ct-kde: backs QT_QPA_PLATFORMTHEME in hypr/modules/env.lua. It is a repo
+  #   package rebuilt with each Qt release, so unlike hyprqt6engine-git it keeps
+  #   loading across Qt minor bumps (Qt 6.12 ignores QPA plugins whose
+  #   major.minor differs from the runtime). Silently does nothing if absent, so
+  #   it must be a hard requirement.
+  # hyprqt6engine-git: no longer backs QT_QPA_PLATFORMTHEME (qt6ct-kde does);
+  #   retained pending cleanup.
   # jq: parses `hyprctl monitors -j` in scripts/brightness-target.sh; missing
   #   it silently degrades the wrapper to always-fallback.
   REQUIRED=(hyprland noctalia kitty hyprlauncher dolphin firefox easyeffects
             xorg-xrandr playerctl hyprpolkitagent zsh eza fastfetch git
-            ddcutil jq hyprqt6engine-git network-manager-applet)
+            ddcutil qt6ct-kde jq hyprqt6engine-git network-manager-applet)
   if [ "$DO_NVIDIA" = true ]; then
     REQUIRED+=(nvidia-utils)
   fi

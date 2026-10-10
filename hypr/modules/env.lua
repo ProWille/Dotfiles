@@ -21,13 +21,15 @@ hl.env("XDG_SESSION_DESKTOP", "Hyprland")
 -- Qt Variables
 hl.env("QT_AUTO_SCREEN_SCALE_FACTOR", "1")
 hl.env("QT_WAYLAND_DISABLE_WINDOWDECORATION", "1")
--- hyprqt6engine, not "kde": the KDE platform theme ships as
+-- qt6ct, not "kde" and not "hyprqt6engine": the KDE platform theme ships as
 -- KDEPlasmaPlatformTheme6.so from plasma-integration, which this setup does
--- not install. hyprqt6engine is the Hyprland-native equivalent (a qt6ct
--- replacement) and still understands KColorScheme, so the colour scheme
--- Noctalia's kcolorscheme template writes keeps applying to Qt apps.
--- See https://wiki.hypr.land/Hypr-Ecosystem/hyprqt6engine/
-hl.env("QT_QPA_PLATFORMTHEME", "hyprqt6engine")
+-- not install. hyprqt6engine is an AUR/chaotic-aur build pinned to a specific
+-- Qt minor; since Qt 6.12 its loader silently ignores any QPA plugin whose
+-- major.minor differs from the runtime ("QPA plugins must match Qt
+-- Major.Minor" in QFactoryLoader), so it fell back to Qt's built-in light
+-- palette after the 6.12 update. qt6ct-kde is rebuilt with every Qt release
+-- and reads the same ~/.config/qt6ct/qt6ct.conf colour scheme.
+hl.env("QT_QPA_PLATFORMTHEME", "qt6ct")
 
 -- NVIDIA Specific
 --hl.env("__GLX_VENDOR_LIBRARY_NAME", "nvidia")
