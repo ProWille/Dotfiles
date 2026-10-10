@@ -160,37 +160,46 @@ exist; it is shipped anyway so the live color template is reproduced.
 
 #### Qt theming
 
-`modules/env.lua` sets `QT_QPA_PLATFORMTHEME=hyprqt6engine`. It cannot be
-`kde`, because that platform theme ships as `KDEPlasmaPlatformTheme6.so` from
-`plasma-integration`, which this setup does not install.
+`modules/env.lua` sets `QT_QPA_PLATFORMTHEME=qt6ct`. It cannot be `kde`, because
+that platform theme ships as `KDEPlasmaPlatformTheme6.so` from
+`plasma-integration`, which this setup does not install. It is deliberately not
+`hyprqt6engine` either: since Qt 6.12, `QFactoryLoader` **silently ignores** any
+QPA platform theme whose major.minor version differs from the running Qt ("QPA
+plugins must match Qt Major.Minor"), and `hyprqt6engine-git` is an AUR build
+pinned to a specific Qt minor. After the 6.12 update it stopped loading and every
+Qt app fell back to Qt's built-in light palette. `qt6ct-kde` is a repo package
+rebuilt with each Qt release, so it keeps loading across minor bumps.
 
-`hypr/hyprqt6engine.conf` is the theme's own config and is **not** read by
-Hyprland — it is read by hyprqt6engine itself, from
-`~/.config/hypr/hyprqt6engine.conf`. Two things about it are easy to get wrong,
-both recorded as comments in the file:
+`qt6ct.conf` is qt6ct's own config; `install.sh` deploys it to
+`~/.config/qt6ct/qt6ct.conf`. Two things about it are easy to get wrong, both
+recorded as comments in the file:
 
-- The format is Hyprlang (`category:key = value`), not ini.
-- `theme:color_scheme` must be an absolute path, so the repo copy carries an
-  `@@HOME@@` placeholder that `install.sh` substitutes after deploying the
-  `hypr/` tree. `cp -a hypr ~/.config/hypr` on its own leaves the placeholder
-  unsubstituted.
+- `color_scheme_path` must be an absolute path, so the repo copy carries an
+  `@@HOME@@` placeholder that `install.sh` substitutes after deploying it (Qt
+  expands neither `~` nor `$HOME` here).
+- `custom_palette=true` is required. Without it qt6ct applies no palette and Qt
+  falls back to light even though a colour scheme is set.
 
 It points at `~/.config/qt6ct/colors/noctalia.conf`, which is Noctalia's own
-`qt` builtin template output. That path is fixed rather than per-palette, so
-the file is rewritten in place on every theme change and the config follows
-along automatically.
+`qt` builtin template output. That path is fixed rather than per-palette, so the
+file is rewritten in place on every theme change and the config follows along
+automatically.
+
+`hypr/hyprqt6engine.conf` is retained from the previous engine but is no longer
+read by anything (nothing sets `QT_QPA_PLATFORMTHEME=hyprqt6engine` now); it is
+kept pending cleanup.
 
 **Do not install `kvantum`.** It registers a Qt style that paints with its own
-palette and discards the one hyprqt6engine loads, which renders every Qt app
-flat grey even though the config is correct. If Qt apps look wrong, check
+palette and discards the one qt6ct loads, which renders every Qt app flat grey
+even though the config is correct. If Qt apps look wrong, check
 `pacman -Q kvantum` first:
 
 ```sh
 sudo pacman -Rs kvantum   # orphaned once Plasma is gone; nothing requires it
 ```
 
-A stray `[theme]` section header, a `~`-prefixed path, or Kvantum installed all
-produce the same symptom: a correct-looking config and light-grey apps.
+A `~`-prefixed `color_scheme_path`, `custom_palette` left false, or Kvantum
+installed all produce the same symptom: a correct-looking config and light apps.
 
 ### Noctalia config
 
@@ -386,7 +395,8 @@ look; re-copy from the live path to resync.
 |------|---------------|
 | `hypr/noctalia.lua` | `~/.config/hypr/noctalia.lua` |
 | `hypr/hyprtoolkit.conf` | `~/.config/hypr/hyprtoolkit.conf` |
-| `hypr/hyprqt6engine.conf` (`@@HOME@@` substituted) | `~/.config/hypr/hyprqt6engine.conf` |
+| `hypr/hyprqt6engine.conf` (`@@HOME@@` substituted; unused, see [Qt theming](#qt-theming)) | `~/.config/hypr/hyprqt6engine.conf` |
+| `qt6ct.conf` (`@@HOME@@` substituted) | `~/.config/qt6ct/qt6ct.conf` |
 | `kitty/themes/noctalia.conf` | `~/.config/kitty/themes/noctalia.conf` |
 | `fastfetch/themes/noctalia.jsonc` (inert) | `~/.config/fastfetch/themes/noctalia.jsonc` |
 | `fastfetch/config.jsonc` | `~/.config/fastfetch/config.jsonc` |
@@ -394,8 +404,10 @@ look; re-copy from the live path to resync.
 `hypr/noctalia.lua` is also a bootstrap: Hyprland boots on a fresh machine
 because the file ships with the repo rather than being generated on first run.
 
-`hypr/hyprqt6engine.conf` is hand-maintained and carries an `@@HOME@@`
-placeholder that `install.sh` substitutes — see [Qt theming](#qt-theming).
+`hypr/hyprqt6engine.conf` is retained from the previous platform theme and is no
+longer read; `qt6ct.conf` is now the active Qt platform-theme config. Both are
+hand-maintained and carry an `@@HOME@@` placeholder that `install.sh`
+substitutes — see [Qt theming](#qt-theming).
 
 `fastfetch/config.jsonc` is fully hand-maintained — see the `templates-apply`
 note above for why the template never touches it. Keys are coloured per section,
