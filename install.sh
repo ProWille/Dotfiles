@@ -393,6 +393,7 @@ deploy_startup "$REPO_DIR/scripts/startup.sh" "$HOME/.local/bin/startup.sh"
 # deploy_file (not deploy_startup) because this is a plain script, not one of
 # startup.sh's @@ORGB_STARTUP@@ templates. cp -a preserves the 755 mode.
 deploy_file "$REPO_DIR/scripts/brightness-target.sh" "$HOME/.local/bin/brightness-target.sh"
+deploy_file "$REPO_DIR/scripts/switch-audio-device.sh" "$HOME/.local/bin/switch-audio-device.sh"
 
 if [ "$DO_GITCONFIG" = true ]; then
   deploy_file "$REPO_DIR/.gitconfig" "$HOME/.gitconfig"

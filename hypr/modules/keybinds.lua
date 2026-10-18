@@ -93,6 +93,12 @@ hl.bind("SHIFT + Print", hl.dsp.exec_cmd(ipc .. " screenshot-region"))
 hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd(ipc .. " volume-up"), { locked = true })
 hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd(ipc .. " volume-down"), { locked = true })
 hl.bind("XF86AudioMute", hl.dsp.exec_cmd(ipc .. " volume-mute"), { locked = true })
+-- Cycle WirePlumber's default device and pop a notification naming the new one:
+-- SUPER + O for outputs (headset -> HDMI -> receiver, wraps), SUPER + I for mics.
+-- EasyEffects' filter chain always ends at the *default* sink, so it re-links
+-- itself when this moves. Locked to match the volume keys above.
+hl.bind(mainMod .. " + O", hl.dsp.exec_cmd("$HOME/.local/bin/switch-audio-device.sh sink"), { locked = true })
+hl.bind(mainMod .. " + I", hl.dsp.exec_cmd("$HOME/.local/bin/switch-audio-device.sh source"), { locked = true })
 -- Same bare-form failure as the SUPER brightness keys had: noctalia defaults to
 -- the focused output, which has no brightness control when a DDC-less display is
 -- focused. Routed through the wrapper for the same reason -- see the note above

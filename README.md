@@ -201,6 +201,17 @@ sudo pacman -Rs kvantum   # orphaned once Plasma is gone; nothing requires it
 A `~`-prefixed `color_scheme_path`, `custom_palette` left false, or Kvantum
 installed all produce the same symptom: a correct-looking config and light apps.
 
+#### Audio devices
+
+`SUPER + O` cycles WirePlumber's default output (headset → HDMI → receiver,
+wrapping) and pops a Noctalia notification naming the new device; `SUPER + I`
+does the same for mics. Both go through `scripts/switch-audio-device.sh`.
+
+EasyEffects sits in the middle of that graph — apps stream into `easyeffects_sink`
+— but its filter chain always ends at the *default* sink, so `wpctl set-default`
+carries the EQ/convolver chain along with everything else. The script only ever
+changes the default, never EasyEffects' own settings.
+
 ### Noctalia config
 
 `noctalia/config.toml` is a **template**: monitor names and lock-screen widget
