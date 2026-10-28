@@ -31,6 +31,7 @@ hl.bind(mainMod .. " + R", hl.dsp.exec_cmd(menu))
 hl.bind(mainMod .. " + T", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))    -- dwindle only
 hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("noctalia msg session lock"))
+hl.bind(mainMod .. " + escape", hl.dsp.exec_cmd("noctalia msg session lock-and-suspend"))
 -- $HOME is required: ~/.local/bin is not on Hyprland's PATH, and a bare name
 -- would fail with "command not found". Binds run via a shell, so $HOME expands.
 hl.bind(mainMod .. " + adiaeresis", hl.dsp.exec_cmd("$HOME/.local/bin/brightness-target.sh up"), { locked = true })
