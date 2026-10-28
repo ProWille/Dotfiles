@@ -129,6 +129,7 @@ copy_to_clipboard = true
 # Session startup extras (OpenRGB + EasyEffects) - see scripts/startup.sh.
 # @@OPENRGB_LOGOUT@@ is filled in by install.sh: an "openrgb --nodetect
 # --profile NAME" command when --openrgb-exit is given, "true" otherwise.
+# OpenRGB automation is desktop-only; install.sh forces "true" on laptops.
 [hooks]
 started = "~/.local/bin/startup.sh"
 logging_out = "@@OPENRGB_LOGOUT@@"

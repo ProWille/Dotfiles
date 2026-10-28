@@ -12,6 +12,9 @@ done
 
 command -v easyeffects >/dev/null 2>&1 && easyeffects --hide-window --service-mode &
 
-# @@ORGB_STARTUP@@ is rendered by install.sh: "--profile NAME" when
-# --openrgb-startup is given, empty otherwise (OpenRGB stays optional).
-command -v openrgb >/dev/null 2>&1 && openrgb --startminimized --server @@ORGB_STARTUP@@ &
+# OpenRGB is desktop-only: skip it entirely on a laptop (install.sh clears the
+# rendered profile there). The PC still applies its profile as before.
+if [ "$(cat "$HOME/.config/machine" 2>/dev/null)" != "laptop" ] &&
+   command -v openrgb >/dev/null 2>&1; then
+  openrgb --startminimized --server @@ORGB_STARTUP@@ &
+fi

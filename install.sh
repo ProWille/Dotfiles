@@ -15,7 +15,7 @@ DO_ASK=true
 # without it is unaffected. These defaults match the live setup (profile "Zones"
 # at session start, profile "Default" on logout) so a fresh install reproduces
 # it; pass --openrgb-startup=NAME / --openrgb-exit=NAME to override, or set them
-# empty here to never force a profile.
+# empty here to never force a profile. Laptops are always disabled below.
 OPENRGB_STARTUP_PROFILE="Zones"
 OPENRGB_EXIT_PROFILE="Default"
 
@@ -70,6 +70,14 @@ if ls /sys/class/drm/ 2>/dev/null | grep -qE 'eDP-|LVDS-'; then
   HOST="laptop"
 fi
 echo "    this machine is a $HOST"
+
+# OpenRGB is desktop-only. A laptop has no RGB hardware to drive, so never
+# start it or run its logout hooks there, whatever the flags say.
+if [ "$HOST" = "laptop" ]; then
+  OPENRGB_STARTUP_PROFILE=""
+  OPENRGB_EXIT_PROFILE=""
+  echo "    OpenRGB automation: disabled (laptop)"
+fi
 
 HAS_NVIDIA=false
 if lspci 2>/dev/null | grep -qi nvidia; then

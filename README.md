@@ -123,8 +123,8 @@ Flags:
 | `--nvidia` | uncomment NVIDIA env vars even on a non-NVIDIA machine |
 | `--skip-deps` | don't check or install packages |
 | `--with-gitconfig` | also deploy `~/.gitconfig` |
-| `--openrgb-startup=NAME` | apply OpenRGB profile NAME at session start (default: `Zones`) |
-| `--openrgb-exit=NAME` | apply OpenRGB profile NAME on logout/reboot/shutdown (default: `Default`) |
+| `--openrgb-startup=NAME` | apply OpenRGB profile NAME at session start (default: `Zones` on desktops, disabled on laptops) |
+| `--openrgb-exit=NAME` | apply OpenRGB profile NAME on logout/reboot/shutdown (default: `Default` on desktops, disabled on laptops) |
 | `--yes` | skip the first-run confirmation prompt |
 
 The installer checks for required packages and optionally installs any that are
@@ -228,9 +228,11 @@ same laptop/pc detection as `host.lua`). The placeholder tokens are:
 
 For the Noctalia hooks, `@@OPENRGB_LOGOUT@@` is additionally filled in by
 `install.sh`: it becomes `openrgb --nodetect --profile NAME`, defaulting to
-`--openrgb-exit` (`Default` out of the box), or the no-op `true` when no exit
+`--openrgb-exit` (`Default` on desktops), or the no-op `true` when no exit
 profile is set. `scripts/startup.sh` likewise has a `@@ORGB_STARTUP@@`
-placeholder rendered from `--openrgb-startup` (`Zones` out of the box).
+placeholder rendered from `--openrgb-startup` (`Zones` on desktops). On a
+laptop both profiles are forced empty, so the hooks render to `true` and the
+startup script skips OpenRGB entirely.
 
 If you deploy manually, substitute them yourself, e.g. for a laptop:
 
@@ -483,12 +485,14 @@ decrease *and* a clean exit *and* no leaked error text.
   NVIDIA GPU (see the `--nvidia` / `--no-nvidia` flags).
 - Session startup extras — OpenRGB and EasyEffects — are launched from
   `~/.local/bin/startup.sh`, which Noctalia runs once via its `started` hook
-  (`[hooks]` in `noctalia/config.toml`). OpenRGB starts with its SDK server
-  enabled and applies the `Zones` profile; the same Noctalia hooks apply the
-  `Default` profile at logout/reboot/shutdown via `openrgb --nodetect` (no
-  rescan — it connects to the running server). Both apps are optional: the
-  startup script skips either silently when not installed, and the hooks
-  degrade to `true` if the exit profile is cleared.
+  (`[hooks]` in `noctalia/config.toml`). On desktops, OpenRGB starts with its
+  SDK server enabled and applies the `Zones` profile; the same Noctalia hooks
+  apply the `Default` profile at logout/reboot/shutdown via `openrgb
+  --nodetect` (no rescan — it connects to the running server). OpenRGB is
+  desktop-only: `install.sh` disables both profiles on laptops and the startup
+  script checks `~/.config/machine`, so a laptop never launches it. Both apps
+  are optional: the startup script skips either silently when not installed,
+  and the hooks degrade to `true` if the exit profile is cleared.
 
 ## License
 
